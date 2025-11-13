@@ -1,0 +1,92 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <a routerLink="/" class="logo-link">
+          <img src="/assets/header-logo.png" alt="TeamTempo Logo" class="logo" />
+        </a>
+        <h1 class="dashboard-title">Dashboard</h1>
+      </div>
+      <nav class="nav">
+        <a routerLink="/" class="nav-link">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    <div class="metrics-container">
+      <!-- Capacity Metric Card -->
+      <div class="metric-card">
+        <div class="metric-header">
+          <h2 class="metric-title">Capacity (Man-Days)</h2>
+          <div class="metric-icon">👥</div>
+        </div>
+        <div class="metric-body">
+          <div class="metric-comparison">
+            <div class="metric-item">
+              <span class="metric-label">Projected</span>
+              <span class="metric-value projected">{{ capacityProjected() }}</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Performed</span>
+              <span class="metric-value performed">{{ capacityPerformed() }}</span>
+            </div>
+          </div>
+          <div class="metric-progress">
+            <div class="progress-bar">
+              <div 
+                class="progress-fill" 
+                [style.width.%]="capacityPercentage"
+                [class.over]="capacityPercentage > 100"
+                [class.under]="capacityPercentage < 100"
+              ></div>
+            </div>
+            <div class="progress-info">
+              <span class="progress-percentage">{{ capacityPercentage | number:'1.1-1' }}%</span>
+              <span class="progress-difference" [class.positive]="capacityDifference > 0" [class.negative]="capacityDifference < 0">
+                {{ capacityDifference > 0 ? '+' : '' }}{{ capacityDifference }} days
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story Points Metric Card -->
+      <div class="metric-card">
+        <div class="metric-header">
+          <h2 class="metric-title">Story Points</h2>
+          <div class="metric-icon">📊</div>
+        </div>
+        <div class="metric-body">
+          <div class="metric-comparison">
+            <div class="metric-item">
+              <span class="metric-label">Projected</span>
+              <span class="metric-value projected">{{ storyPointsProjected() }}</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">Delivered</span>
+              <span class="metric-value performed">{{ storyPointsDelivered() }}</span>
+            </div>
+          </div>
+          <div class="metric-progress">
+            <div class="progress-bar">
+              <div 
+                class="progress-fill" 
+                [style.width.%]="storyPointsPercentage"
+                [class.over]="storyPointsPercentage > 100"
+                [class.under]="storyPointsPercentage < 100"
+              ></div>
+            </div>
+            <div class="progress-info">
+              <span class="progress-percentage">{{ storyPointsPercentage | number:'1.1-1' }}%</span>
+              <span class="progress-difference" [class.positive]="storyPointsDifference > 0" [class.negative]="storyPointsDifference < 0">
+                {{ storyPointsDifference > 0 ? '+' : '' }}{{ storyPointsDifference }} points
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+

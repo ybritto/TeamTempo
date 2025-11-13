@@ -1,0 +1,213 @@
+.landing-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+}
+
+.header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border-gray);
+  padding: 0.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: visible;
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 60px;
+  }
+
+  .logo {
+    height: 300px;
+    width: auto;
+    object-fit: contain;
+    margin-top: -6.5rem;
+    margin-bottom: -6.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: filter 0.3s ease;
+    
+    &:hover {
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+    }
+  }
+
+  .nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .nav-link {
+    color: var(--text-gray);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: var(--light-gray);
+      color: var(--primary-teal);
+    }
+  }
+}
+
+.hero {
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    min-height: 500px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .hero-text {
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--text-gray);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary-teal) 0%, var(--accent-lime) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+
+      @media (max-width: 768px) {
+        font-size: 2.5rem;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      color: var(--text-gray);
+      margin-bottom: 1rem;
+      font-weight: 500;
+
+      @media (max-width: 768px) {
+        font-size: 1.25rem;
+      }
+    }
+
+    .hero-description {
+      font-size: 1.125rem;
+      color: #546e7a;
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      .btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.125rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+
+        &.btn-primary {
+          background: var(--primary-teal);
+          color: var(--white);
+
+          &:hover {
+            background: #3A9A8F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(77, 182, 172, 0.3);
+          }
+        }
+      }
+    }
+  }
+
+  .hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .metronome-icon {
+      max-width: 100%;
+      height: auto;
+      max-height: 400px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    }
+  }
+}
+
+.features {
+  padding: 4rem 2rem;
+  background: var(--white);
+
+  .features-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .features-title {
+    font-size: 2.5rem;
+    text-align: center;
+    color: var(--text-gray);
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    background: var(--light-gray);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary-teal);
+    }
+
+    .feature-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1rem;
+      height: 80px;
+      width: 100%;
+
+      svg {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      color: var(--text-gray);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #546e7a;
+      line-height: 1.6;
+    }
+  }
+}
+
