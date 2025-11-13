@@ -1,0 +1,32 @@
+<header class="app-header">
+  <div class="header-content">
+    <div class="header-left">
+      @if (showLogoLink()) {
+        <a routerLink="/" class="logo-link">
+          @if (logoWithTagline()) {
+            <img src="/assets/header-logo-with-tagline.png" alt="TeamTempo Logo" class="logo" />
+          } @else {
+            <img src="/assets/header-logo.png" alt="TeamTempo Logo" class="logo" />
+          }
+        </a>
+      } @else {
+        @if (logoWithTagline()) {
+          <img src="/assets/header-logo-with-tagline.png" alt="TeamTempo Logo" class="logo" />
+        } @else {
+          <img src="/assets/header-logo.png" alt="TeamTempo Logo" class="logo" />
+        }
+      }
+      @if (title()) {
+        <h1 class="page-title">{{ title() }}</h1>
+      }
+    </div>
+    @if (navLinks().length > 0) {
+      <nav class="nav">
+        @for (link of navLinks(); track link.route) {
+          <a [routerLink]="link.route" class="nav-link">{{ link.label }}</a>
+        }
+      </nav>
+    }
+  </div>
+</header>
+

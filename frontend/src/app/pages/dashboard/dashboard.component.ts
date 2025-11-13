@@ -1,15 +1,17 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { HeaderComponent } from '../../shared/header/header.component';
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, HeaderComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+  navLinks = [
+    { label: 'Home', route: '/' }
+  ];
   // Sample data - in a real app, this would come from a service
   capacityProjected = signal(120);
   capacityPerformed = signal(105);

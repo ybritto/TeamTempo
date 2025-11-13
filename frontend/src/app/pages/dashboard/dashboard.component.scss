@@ -3,62 +3,6 @@
   background: var(--light-gray);
 }
 
-.dashboard-header {
-  background: var(--white);
-  border-bottom: 1px solid var(--border-gray);
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-  .header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  .logo-link {
-    display: flex;
-    align-items: center;
-  }
-
-  .logo {
-    height: 40px;
-    width: auto;
-  }
-
-  .dashboard-title {
-    font-size: 1.75rem;
-    color: var(--text-gray);
-    margin: 0;
-    font-weight: 600;
-  }
-
-  .nav {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-  }
-
-  .nav-link {
-    color: var(--text-gray);
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: var(--light-gray);
-      color: var(--primary-teal);
-    }
-  }
-}
 
 .dashboard-content {
   max-width: 1400px;

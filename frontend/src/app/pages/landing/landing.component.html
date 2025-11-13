@@ -1,18 +1,14 @@
 <div class="landing-container">
-  <header class="header">
-    <div class="header-content">
-      <img src="/assets/header-logo-with-tagline.png" alt="TeamTempo Logo" class="logo" />
-      <nav class="nav">
-        <a routerLink="/dashboard" class="nav-link">Dashboard</a>
-      </nav>
-    </div>
-  </header>
+  <app-header 
+    [logoWithTagline]="true" 
+    [navLinks]="navLinks"
+    [showLogoLink]="false" />
 
   <main class="hero">
     <div class="hero-content">
       <div class="hero-text">
         <h1 class="hero-title">TeamTempo</h1>
-        <p class="hero-subtitle">Empower Your Scrum Masters with Powerful Projection Tools</p>
+        <p class="hero-subtitle">Empower Your Agile Teams with Powerful Projection Tools</p>
         <p class="hero-description">
           Track and analyze your team's capacity and story points with precision. 
           Make data-driven decisions to optimize your sprint planning and delivery.
