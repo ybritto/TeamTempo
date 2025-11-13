@@ -6,6 +6,19 @@
     [showLogoLink]="true" />
 
   <main class="dashboard-content">
+    <div class="team-selector-container">
+      <label for="team-select" class="team-selector-label">Select Team</label>
+      <select 
+        id="team-select"
+        class="team-selector"
+        [value]="selectedTeamId()"
+        (change)="onTeamChange($event)">
+        @for (team of teams(); track team.id) {
+          <option [value]="team.id">{{ team.name }}</option>
+        }
+      </select>
+    </div>
+
     <div class="metrics-container">
       <!-- Capacity Metric Card -->
       <div class="metric-card">
@@ -28,15 +41,15 @@
             <div class="progress-bar">
               <div 
                 class="progress-fill" 
-                [style.width.%]="capacityPercentage"
-                [class.over]="capacityPercentage > 100"
-                [class.under]="capacityPercentage < 100"
+                [style.width.%]="capacityPercentage()"
+                [class.over]="capacityPercentage() > 100"
+                [class.under]="capacityPercentage() < 100"
               ></div>
             </div>
             <div class="progress-info">
-              <span class="progress-percentage">{{ capacityPercentage | number:'1.1-1' }}%</span>
-              <span class="progress-difference" [class.positive]="capacityDifference > 0" [class.negative]="capacityDifference < 0">
-                {{ capacityDifference > 0 ? '+' : '' }}{{ capacityDifference }} days
+              <span class="progress-percentage">{{ capacityPercentage() | number:'1.1-1' }}%</span>
+              <span class="progress-difference" [class.positive]="capacityDifference() > 0" [class.negative]="capacityDifference() < 0">
+                {{ capacityDifference() > 0 ? '+' : '' }}{{ capacityDifference() }} days
               </span>
             </div>
           </div>
@@ -64,15 +77,15 @@
             <div class="progress-bar">
               <div 
                 class="progress-fill" 
-                [style.width.%]="storyPointsPercentage"
-                [class.over]="storyPointsPercentage > 100"
-                [class.under]="storyPointsPercentage < 100"
+                [style.width.%]="storyPointsPercentage()"
+                [class.over]="storyPointsPercentage() > 100"
+                [class.under]="storyPointsPercentage() < 100"
               ></div>
             </div>
             <div class="progress-info">
-              <span class="progress-percentage">{{ storyPointsPercentage | number:'1.1-1' }}%</span>
-              <span class="progress-difference" [class.positive]="storyPointsDifference > 0" [class.negative]="storyPointsDifference < 0">
-                {{ storyPointsDifference > 0 ? '+' : '' }}{{ storyPointsDifference }} points
+              <span class="progress-percentage">{{ storyPointsPercentage() | number:'1.1-1' }}%</span>
+              <span class="progress-difference" [class.positive]="storyPointsDifference() > 0" [class.negative]="storyPointsDifference() < 0">
+                {{ storyPointsDifference() > 0 ? '+' : '' }}{{ storyPointsDifference() }} points
               </span>
             </div>
           </div>
