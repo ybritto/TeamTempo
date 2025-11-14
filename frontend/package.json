@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "client-gen": "openapi-generator-cli generate -i ../api/rest/api-v1.yaml -g typescript-angular -o src/api --type-mappings=string+date=string"
   },
   "prettier": {
     "printWidth": 100,
@@ -33,7 +34,8 @@
     "primeng": "^20.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@openapitools/openapi-generator-cli": "^2.14.1"
   },
   "devDependencies": {
     "@angular/build": "^20.3.10",
