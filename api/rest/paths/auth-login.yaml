@@ -14,13 +14,25 @@ post:
           $ref: "../schemas/authentication.yaml#/LoginUserDto"
   responses:
     '200':
-      description: 'Absence successfully created'
+      description: 'Login successfully executed'
       content:
         'application/json':
           schema:
             $ref: "../schemas/authentication.yaml#/LoginResponseDto"
     '400':
       description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '401':
+      description: 'Unauthorised'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '403':
+      description: 'Forbidden'
       content:
         'application/problem+json':
           schema:

@@ -1,3 +1,43 @@
 spring:
   application:
     name: TeamTempo App - Backend
+
+  datasource:
+    url: jdbc:postgresql://${app.db.host}:${app.db.port}/${app.db.name}
+    username: ${app.db.username}
+    password: ${app.db.password}
+    driver-class-name: ${POSTGRES_DRIVER:org.postgresql.Driver}
+
+  jpa:
+    database: postgresql
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
+
+  flyway:
+    url: jdbc:postgresql://${app.db.host}:${app.db.port}/${app.db.name}
+    user: ${app.db.username}
+    password: ${app.db.password}
+    clean-disabled: false
+    default-schema: public
+    create-schemas: true
+
+
+app:
+  db:
+    host: ${APP_DB_HOST:localhost}
+    port: ${APP_DB_PORT:5432}
+    name: ${APP_DB_NAME:teamtempo}
+    username: ${APP_DB_USERNAME:teamtempo_admin}
+    password: ${APP_DB_PASSWORD:teamtempo_password}
+
+security:
+  jwt:
+    secret-key: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+    # 24h in millisecond
+    expiration-time: 86400000

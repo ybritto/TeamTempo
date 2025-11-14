@@ -43,96 +43,106 @@ import java.util.UUID;
         })
 public class UserEntity implements UserDetails {
 
-        @Id
-        @Column(name = "key_id")
-        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSeqGen")
-        @SequenceGenerator(name = "userSeqGen", sequenceName = "app_user_key_id_seq", allocationSize = 1)
-        private Long id;
+    @Id
+    @Column(name = "key_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSeqGen")
+    @SequenceGenerator(name = "userSeqGen", sequenceName = "app_user_key_id_seq", allocationSize = 1)
+    private Long id;
 
-        @Column(name = "uuid", unique = true, nullable = false, updatable = false)
-        private UUID uuid;
+    @Column(name = "uuid", unique = true, nullable = false, updatable = false)
+    private UUID uuid;
 
-        @Column(nullable = false, name = "full_name", length = 200)
-        @NotNull(message = "Name can not be null")
-        @NotEmpty(message = "Name can not be empty")
-        @Size(min = 1, max = 200)
-        private String fullName;
+    @Column(nullable = false, name = "first_name", length = 200)
+    @NotNull(message = "First name can not be null")
+    @NotEmpty(message = "First name can not be empty")
+    @Size(min = 1, max = 200)
+    private String firstName;
 
-        @Column(name = "email", length = 1000, nullable = false, unique = true)
-        @Email(message = "Email should be valid")
-        @Size(max = 1000)
-        @NotNull(message = "Email can not be null")
-        @NotEmpty(message = "Email can not be empty")
-        private String email;
+    @Column(nullable = false, name = "last_name", length = 200)
+    @NotNull(message = "Last name can not be null")
+    @NotEmpty(message = "Last name can not be empty")
+    @Size(min = 1, max = 200)
+    private String lastName;
 
-        @Column(name = "password", nullable = false, length = 255)
-        @NotNull(message = "Password can not be null")
-        @NotEmpty(message = "Password can not be empty")
-        @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
-        private String password;
+    @Column(name = "email", length = 1000, nullable = false, unique = true)
+    @Email(message = "Email should be valid")
+    @Size(max = 100)
+    @NotNull(message = "Email can not be null")
+    @NotEmpty(message = "Email can not be empty")
+    private String email;
 
-        @Column(name = "enabled", nullable = false)
-        @NotNull(message = "Enabled status can not be null")
-        private boolean enabled = true;
+    @Column(name = "password", nullable = false, length = 255)
+    @NotNull(message = "Password can not be null")
+    @NotEmpty(message = "Password can not be empty")
+    @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
+    private String password;
 
-        @Enumerated(EnumType.STRING)
-        @Column(name = "role", nullable = false)
-        private SecurityRoleEnum role = SecurityRoleEnum.USER; // Default role
+    @Column(name = "enabled", nullable = false)
+    @NotNull(message = "Enabled status can not be null")
+    private boolean enabled = true;
 
-        @Column(name = "created_at", nullable = false)
-        private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private SecurityRoleEnum role = SecurityRoleEnum.USER; // Default role
 
-        @Column(name = "updated_at", nullable = false)
-        private LocalDateTime updatedAt;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
-        @PrePersist
-        private void prePersist() {
-                if (this.uuid == null) {
-                        this.uuid = UUID.randomUUID();
-                }
-                if (this.createdAt == null) {
-                        this.createdAt = LocalDateTime.now();
-                }
-                if (this.updatedAt == null) {
-                        this.updatedAt = LocalDateTime.now();
-                }
-                if (this.role == null) {
-                        this.role = SecurityRoleEnum.USER;
-                }
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    private void prePersist() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
         }
-
-        @PreUpdate
-        private void preUpdate() {
-                this.updatedAt = LocalDateTime.now();
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
         }
-
-        @Override
-        public Collection<? extends GrantedAuthority> getAuthorities() {
-                return List.of();
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
         }
-
-        @Override
-        public String getUsername() {
-                return this.getEmail();
+        if (this.role == null) {
+            this.role = SecurityRoleEnum.USER;
         }
+    }
 
-        @Override
-        public boolean isAccountNonExpired() {
-                return UserDetails.super.isAccountNonExpired();
-        }
+    @PreUpdate
+    private void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
-        @Override
-        public boolean isAccountNonLocked() {
-                return UserDetails.super.isAccountNonLocked();
-        }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
 
-        @Override
-        public boolean isCredentialsNonExpired() {
-                return UserDetails.super.isCredentialsNonExpired();
-        }
+    public String getFullName() {
+        return this.getFirstName() + " " + this.getLastName();
+    }
 
-        @Override
-        public boolean isEnabled() {
-                return UserDetails.super.isEnabled();
-        }
+    @Override
+    public String getUsername() {
+        return this.getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
 }
