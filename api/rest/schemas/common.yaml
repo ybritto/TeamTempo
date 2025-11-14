@@ -1,0 +1,13 @@
+ProblemDto:
+  description: Object Representation of an Session Detail
+  type: object
+  properties:
+    httpStatusCode:
+      type: integer
+    httpStatusReasonPhrase:
+      type: string
+    title:
+      type: string
+    details:
+      type: string
+

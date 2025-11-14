@@ -1,0 +1,61 @@
+UserDto:
+  description: Representation of the user in the system
+  type: object
+  properties:
+    uuid:
+      type: string
+    name:
+      type: string
+    email:
+      type: string
+    enabled:
+      type: boolean
+
+RegisterUserDto:
+  description: DTO to represent a new user to be registered in the system
+  type: object
+  properties:
+    email:
+      type: string
+    password:
+      type: string
+    fullName:
+      type: string
+
+LoginUserDto:
+  description: DTO to represent user credentials to authenticate in the system
+  type: object
+  properties:
+    email:
+      type: string
+    password:
+      type: string
+
+LoginResponseDto:
+  description: DTO containing information of an authenticated user
+  type: object
+  properties:
+    email:
+      type: string
+    token:
+      type: string
+    expiresIn:
+      type: integer
+      format: int64
+    role:
+      $ref: '#/SecurityRoleEnumDto'
+
+LogoutResponseDto:
+  description: DTO containing logout confirmation
+  type: object
+  properties:
+    message:
+      type: string
+    timestamp:
+      type: string
+      format: date-time
+
+SecurityRoleEnumDto:
+  enum:
+    - ADMIN
+    - USER

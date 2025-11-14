@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -82,6 +84,27 @@ public class UserEntity implements UserDetails {
 
         @Column(name = "updated_at", nullable = false)
         private LocalDateTime updatedAt;
+
+        @PrePersist
+        private void prePersist() {
+                if (this.uuid == null) {
+                        this.uuid = UUID.randomUUID();
+                }
+                if (this.createdAt == null) {
+                        this.createdAt = LocalDateTime.now();
+                }
+                if (this.updatedAt == null) {
+                        this.updatedAt = LocalDateTime.now();
+                }
+                if (this.role == null) {
+                        this.role = SecurityRoleEnum.USER;
+                }
+        }
+
+        @PreUpdate
+        private void preUpdate() {
+                this.updatedAt = LocalDateTime.now();
+        }
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {

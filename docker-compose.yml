@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  teamtempo-db:
+    image: postgres
+    container_name: teamtempo-db
+    environment:
+      POSTGRES_DB: teamtempo
+      POSTGRES_USER: teamtempo_admin
+      POSTGRES_PASSWORD: teamtempo_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - teamtempo-postgres-data:/var/lib/postgresql
+    restart: unless-stopped
+
+volumes:
+  teamtempo-postgres-data:
+

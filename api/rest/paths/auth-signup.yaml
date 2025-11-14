@@ -1,0 +1,39 @@
+post:
+  tags:
+    - authentication
+  summary: Register a new user in the system
+  description: Register a new user in the system
+  operationId: signup
+  security: []
+  requestBody:
+    description: 'User to register'
+    required: true
+    content:
+      'application/json':
+        schema:
+          $ref: "../schemas/authentication.yaml#/RegisterUserDto"
+  responses:
+    '200':
+      description: 'Absence successfully created'
+      content:
+        'application/json':
+          schema:
+            $ref: "../schemas/authentication.yaml#/UserDto"
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"

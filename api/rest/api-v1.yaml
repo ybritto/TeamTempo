@@ -1,0 +1,33 @@
+openapi: 3.0.4
+info:
+  title: TeamTempo App
+  description: An application where team planning find its tempo
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: URL for local development
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/signup:
+    $ref: "./paths/auth-signup.yaml"
+  /auth/login:
+    $ref: "./paths/auth-login.yaml"
+  /auth/logout:
+    $ref: "./paths/auth-logout.yaml"
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      description: "JWT auth description"
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+      in: header
+
+
+
+    

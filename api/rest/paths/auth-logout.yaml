@@ -1,0 +1,25 @@
+post:
+  tags:
+    - authentication
+  summary: Logout a user from the system
+  description: Logout user from the system and invalidate the current session
+  operationId: logout
+  responses:
+    '200':
+      description: 'User successfully logged out'
+      content:
+        'application/json':
+          schema:
+            $ref: "../schemas/authentication.yaml#/LogoutResponseDto"
+    '401':
+      description: 'Unauthorized - Invalid or missing token'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
