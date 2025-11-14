@@ -57,6 +57,10 @@
     }
 
     .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+
       .btn {
         display: inline-block;
         padding: 1rem 2rem;
@@ -74,6 +78,19 @@
 
           &:hover {
             background: #3A9A8F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(77, 182, 172, 0.3);
+          }
+        }
+
+        &.btn-secondary {
+          background: transparent;
+          color: var(--primary-teal);
+          border: 2px solid var(--primary-teal);
+
+          &:hover {
+            background: var(--primary-teal);
+            color: var(--white);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(77, 182, 172, 0.3);
           }

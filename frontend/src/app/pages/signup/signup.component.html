@@ -1,0 +1,123 @@
+<div class="signup-container">
+  <app-header 
+    [logoWithTagline]="false" 
+    [showLogoLink]="true" />
+
+  <main class="signup-main">
+    <div class="signup-card">
+      <h1 class="signup-title">Create Account</h1>
+      <p class="signup-subtitle">Join TeamTempo and start planning with precision</p>
+
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input
+            id="fullName"
+            type="text"
+            formControlName="fullName"
+            placeholder="Enter your full name"
+            [class.error]="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched"
+          />
+          @if (signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched) {
+            <span class="error-message">
+              @if (signupForm.get('fullName')?.errors?.['required']) {
+                Full name is required
+              } @else if (signupForm.get('fullName')?.errors?.['minlength']) {
+                Full name must be at least 2 characters
+              }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            [class.error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+          />
+          @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
+            <span class="error-message">
+              @if (signupForm.get('email')?.errors?.['required']) {
+                Email is required
+              } @else if (signupForm.get('email')?.errors?.['email']) {
+                Please enter a valid email
+              }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            [class.error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+          />
+          @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
+            <span class="error-message">
+              @if (signupForm.get('password')?.errors?.['required']) {
+                Password is required
+              } @else if (signupForm.get('password')?.errors?.['minlength']) {
+                Password must be at least 6 characters
+              }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [class.error]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched"
+          />
+          @if (signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched) {
+            <span class="error-message">
+              @if (signupForm.get('confirmPassword')?.errors?.['required']) {
+                Please confirm your password
+              } @else if (signupForm.get('confirmPassword')?.errors?.['passwordMismatch']) {
+                Passwords do not match
+              }
+            </span>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-error">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        @if (successMessage()) {
+          <div class="alert alert-success">
+            {{ successMessage() }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-full"
+          [disabled]="isLoading() || signupForm.invalid"
+        >
+          @if (isLoading()) {
+            <span>Creating account...</span>
+          } @else {
+            <span>Sign Up</span>
+          }
+        </button>
+      </form>
+
+      <div class="signup-footer">
+        <p>Already have an account? <a routerLink="/login" class="link">Sign in</a></p>
+      </div>
+    </div>
+  </main>
+</div>
+
