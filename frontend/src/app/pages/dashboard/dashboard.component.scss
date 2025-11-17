@@ -18,6 +18,19 @@
   flex-wrap: wrap;
 }
 
+.create-team-link {
+  font-size: 0.875rem;
+  color: var(--primary-teal);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #3A9A8F;
+    text-decoration: underline;
+  }
+}
+
 .team-selector-label {
   font-size: 1rem;
   font-weight: 600;

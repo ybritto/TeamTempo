@@ -1,5 +1,6 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../../shared/header/header.component';
 import { TeamService } from '../../../api/api/team.service';
 import { TeamDto } from '../../../api/model/teamDto';
@@ -15,7 +16,7 @@ interface Team {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, HeaderComponent],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -23,6 +24,7 @@ export class DashboardComponent {
   private teamService = inject(TeamService);
 
   navLinks = [
+    { label: 'Teams', route: '/teams' },
     { label: 'Home', route: '/' }
   ];
 

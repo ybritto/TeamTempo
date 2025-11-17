@@ -1,0 +1,138 @@
+<div class="teams-container">
+  <app-header 
+    title="My Teams"
+    [logoWithTagline]="false" 
+    [navLinks]="navLinks"
+    [showLogoLink]="true" />
+
+  <main class="teams-content">
+    @if (loading()) {
+      <div class="loading-container">
+        <p>Loading teams...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-container">
+        <p>{{ error() }}</p>
+        <button (click)="loadTeams()" class="retry-button">Retry</button>
+      </div>
+    } @else {
+      <div class="teams-header">
+        <h1>My Teams</h1>
+        <button 
+          (click)="toggleCreateForm()" 
+          class="create-button"
+          [class.active]="showCreateForm()">
+          {{ showCreateForm() ? 'Cancel' : '+ Create Team' }}
+        </button>
+      </div>
+
+      @if (showCreateForm()) {
+        <div class="create-form-container">
+          <h2>Create New Team</h2>
+          <form [formGroup]="createTeamForm" (ngSubmit)="onSubmit()" class="create-form">
+            <div class="form-group">
+              <label for="name">Team Name *</label>
+              <input 
+                type="text" 
+                id="name" 
+                formControlName="name"
+                class="form-input"
+                [class.error]="createTeamForm.get('name')?.invalid && createTeamForm.get('name')?.touched"
+                placeholder="Enter team name">
+              @if (createTeamForm.get('name')?.invalid && createTeamForm.get('name')?.touched) {
+                <span class="error-message">Team name is required (max 200 characters)</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea 
+                id="description" 
+                formControlName="description"
+                class="form-textarea"
+                rows="4"
+                placeholder="Enter team description (optional)"></textarea>
+              @if (createTeamForm.get('description')?.invalid && createTeamForm.get('description')?.touched) {
+                <span class="error-message">Description must be less than 1000 characters</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startDate">Start Date *</label>
+                <input 
+                  type="date" 
+                  id="startDate" 
+                  formControlName="startDate"
+                  class="form-input"
+                  [class.error]="createTeamForm.get('startDate')?.invalid && createTeamForm.get('startDate')?.touched">
+              @if (createTeamForm.get('startDate')?.invalid && createTeamForm.get('startDate')?.touched) {
+                <span class="error-message">Start date is required</span>
+              }
+              </div>
+
+              <div class="form-group">
+                <label for="endDate">End Date</label>
+                <input 
+                  type="date" 
+                  id="endDate" 
+                  formControlName="endDate"
+                  class="form-input"
+                  placeholder="Optional">
+              </div>
+            </div>
+
+            @if (createError()) {
+              <div class="error-message-container">
+                <p class="error-message">{{ createError() }}</p>
+              </div>
+            }
+
+            <div class="form-actions">
+              <button 
+                type="submit" 
+                class="submit-button"
+                [disabled]="creating() || createTeamForm.invalid">
+                {{ creating() ? 'Creating...' : 'Create Team' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      @if (teams().length === 0) {
+        <div class="empty-container">
+          <p>You don't have any teams yet.</p>
+          <p>Create your first team to get started!</p>
+        </div>
+      } @else {
+        <div class="teams-list">
+          @for (team of teams(); track team.uuid) {
+            <div class="team-card">
+              <div class="team-card-header">
+                <h3 class="team-name">{{ team.name || 'Unnamed Team' }}</h3>
+                <span class="team-uuid">{{ team.uuid }}</span>
+              </div>
+              @if (team.description) {
+                <p class="team-description">{{ team.description }}</p>
+              }
+              <div class="team-dates">
+                <div class="date-item">
+                  <span class="date-label">Start:</span>
+                  <span class="date-value">{{ formatDate(team.startDate) }}</span>
+                </div>
+                @if (team.endDate) {
+                  <div class="date-item">
+                    <span class="date-label">End:</span>
+                    <span class="date-value">{{ formatDate(team.endDate) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </main>
+</div>
+
