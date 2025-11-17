@@ -4,7 +4,6 @@ get:
   summary: Get all my
   description: Get all teams associated to the logged user
   operationId: myTeams
-  security: []
   responses:
     '200':
       description: OK
