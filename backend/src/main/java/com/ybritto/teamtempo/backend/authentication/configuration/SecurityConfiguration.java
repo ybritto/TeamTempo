@@ -45,14 +45,8 @@ public class SecurityConfiguration {
 
                         // KEEP ADMIN ENDPOINTS AT THE BEGINNING. ORDERING MATTERS FOR SPRING SECURITY
                         // I.E: If /teams/sync is moved after /teams/**, the first will take precedence
-                        .requestMatchers(HttpMethod.POST, "/teams/sync").hasRole(SecurityRoleEnum.ADMIN.toString())
 
                         // FEATURE ENDPOINT DEFINITIONS
-                        .requestMatchers("/absences/**").hasAnyRole(allRolesAsString)
-                        .requestMatchers("/holidays/**").hasAnyRole(allRolesAsString)
-                        .requestMatchers(HttpMethod.GET,"/locations/**").hasAnyRole(allRolesAsString)
-                        .requestMatchers("/people/**").hasAnyRole(allRolesAsString)
-                        .requestMatchers(HttpMethod.GET, "/roles/**").hasAnyRole(allRolesAsString)
                         .requestMatchers("/teams/**").hasAnyRole(allRolesAsString)
 
                         .anyRequest().authenticated())

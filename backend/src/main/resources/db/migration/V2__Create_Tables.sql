@@ -14,3 +14,21 @@ CREATE TABLE app_user
     CONSTRAINT app_user_uuid_unique UNIQUE (uuid),
     CONSTRAINT app_user_email_unique UNIQUE (email)
 );
+
+CREATE TABLE team
+(
+    KEY_ID      serial PRIMARY KEY,
+    UUID UUID NOT NULL DEFAULT uuid_generate_v4(),
+    NAME        varchar(200)  NOT NULL,
+    DESCRIPTION varchar(1000) NOT NULL,
+    START_DATE  DATE          NOT NULL,
+    END_DATE    DATE          NOT NULL,
+    APP_USER_ID int           NOT NULL,
+
+    CREATED_AT timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UPDATED_AT timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT team_uuid_unique UNIQUE (uuid),
+    CONSTRAINT fk_team_app_user FOREIGN KEY (APP_USER_ID) REFERENCES app_user (KEY_ID) ON DELETE RESTRICT
+);
+

@@ -1,0 +1,22 @@
+get:
+  tags:
+    - team
+  summary: Get all my
+  description: Get all teams associated to the logged user
+  operationId: myTeams
+  security: []
+  responses:
+    '200':
+      description: OK
+      content:
+        'application/json':
+          schema:
+            type: array
+            items:
+              $ref: '../schemas/team.yaml#/TeamDto'
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"

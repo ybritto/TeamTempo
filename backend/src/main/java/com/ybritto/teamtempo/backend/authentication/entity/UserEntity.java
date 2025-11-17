@@ -1,12 +1,15 @@
 package com.ybritto.teamtempo.backend.authentication.entity;
 
+import com.ybritto.teamtempo.backend.features.team.entity.TeamEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
@@ -30,8 +33,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder(toBuilder = true) // toBuilder is true to facilitate object copy/transformation to perform IT tests
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor // All Args constructor is needed for builder
+@NoArgsConstructor // No args constructor is needed for JPA specification
 @Getter
 @EqualsAndHashCode(of = {"uuid"})
 @Entity
@@ -45,8 +48,8 @@ public class UserEntity implements UserDetails {
 
     @Id
     @Column(name = "key_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSeqGen")
-    @SequenceGenerator(name = "userSeqGen", sequenceName = "app_user_key_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appUserSeqGen")
+    @SequenceGenerator(name = "appUserSeqGen", sequenceName = "app_user_key_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "uuid", unique = true, nullable = false, updatable = false)
@@ -58,7 +61,7 @@ public class UserEntity implements UserDetails {
     @Size(min = 1, max = 200)
     private String name;
 
-    @Column(name = "email", length = 1000, nullable = false, unique = true)
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     @Email(message = "Email should be valid")
     @Size(max = 100)
     @NotNull(message = "Email can not be null")
@@ -78,6 +81,9 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private SecurityRoleEnum role = SecurityRoleEnum.USER; // Default role
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<TeamEntity> teams;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

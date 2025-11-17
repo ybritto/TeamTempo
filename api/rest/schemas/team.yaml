@@ -1,0 +1,16 @@
+TeamDto:
+  description: Representation of the team in the system
+  type: object
+  properties:
+    uuid:
+      type: string
+    name:
+      type: string
+    description:
+      type: string
+    startDate:
+      type: string
+      format: date
+    endDate:
+      type: string
+      format: date

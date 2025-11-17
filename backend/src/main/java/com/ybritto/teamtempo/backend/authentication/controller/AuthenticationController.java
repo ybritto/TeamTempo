@@ -31,7 +31,7 @@ public class AuthenticationController implements AuthApi {
 
     @Override
     public ResponseEntity<UserDto> signup(RegisterUserDto registerUserDto) {
-        logger.info("GET /auth/signup - Registering {} in the app",  registerUserDto.getFullName());
+        logger.info("GET /auth/signup - Registering {} in the app",  registerUserDto.getName());
         UserDto userDto = authenticationService.signup(registerUserDto);
         logger.info("GET /auth/signup - signup for {} executed successfully", userDto.getEmail());
         return ResponseEntity.ok(userDto);
