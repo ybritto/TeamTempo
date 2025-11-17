@@ -57,6 +57,12 @@
     font-weight: 600;
   }
 
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .nav {
     display: flex;
     gap: 1rem;
@@ -74,6 +80,28 @@
     &:hover {
       background: var(--light-gray);
       color: var(--primary-teal);
+    }
+  }
+
+  .logout-btn {
+    background-color: #E53935;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #c62828;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(229, 57, 53, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
 }

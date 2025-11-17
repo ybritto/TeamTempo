@@ -29,6 +29,5 @@ public interface AuthenticationMapper {
     @Mapping(target = "password", source = "password")
     UserEntity mapEntity(RegisterUserDto registerUserDto, String password);
 
-    @Mapping(target = "name", source = "fullName")
     UserDto mapDto(UserEntity userSaved);
 }

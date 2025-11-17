@@ -20,13 +20,20 @@
         <h1 class="page-title">{{ title() }}</h1>
       }
     </div>
-    @if (navLinks().length > 0) {
-      <nav class="nav">
-        @for (link of navLinks(); track link.route) {
-          <a [routerLink]="link.route" class="nav-link">{{ link.label }}</a>
-        }
-      </nav>
-    }
+    <div class="header-right">
+      @if (navLinks().length > 0) {
+        <nav class="nav">
+          @for (link of navLinks(); track link.route) {
+            <a [routerLink]="link.route" class="nav-link">{{ link.label }}</a>
+          }
+        </nav>
+      }
+      @if (isAuthenticated()) {
+        <button type="button" (click)="onLogout()" class="logout-btn">
+          Logout
+        </button>
+      }
+    </div>
   </div>
 </header>
 

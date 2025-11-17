@@ -5,15 +5,19 @@ import com.ybritto.teamtempo.backend.authentication.mapper.AuthenticationMapper;
 import com.ybritto.teamtempo.backend.authentication.repository.UserRepository;
 import com.ybritto.teamtempo.backend.gen.model.LoginResponseDto;
 import com.ybritto.teamtempo.backend.gen.model.LoginUserDto;
+import com.ybritto.teamtempo.backend.gen.model.LogoutResponseDto;
 import com.ybritto.teamtempo.backend.gen.model.RegisterUserDto;
 import com.ybritto.teamtempo.backend.gen.model.UserDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
 
 @Service
 @AllArgsConstructor
@@ -58,5 +62,17 @@ public class AuthenticationService {
                         )
                 )
         );
+    }
+
+    public LogoutResponseDto logout() {
+        // Clear the security context
+        SecurityContextHolder.clearContext();
+
+        // Create logout response
+        LogoutResponseDto logoutResponse = new LogoutResponseDto();
+        logoutResponse.setMessage("User successfully logged out");
+        logoutResponse.setTimestamp(OffsetDateTime.now());
+
+        return logoutResponse;
     }
 }

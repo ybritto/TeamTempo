@@ -4,6 +4,7 @@ import com.ybritto.teamtempo.backend.authentication.service.AuthenticationServic
 import com.ybritto.teamtempo.backend.gen.api.AuthApi;
 import com.ybritto.teamtempo.backend.gen.model.LoginResponseDto;
 import com.ybritto.teamtempo.backend.gen.model.LoginUserDto;
+import com.ybritto.teamtempo.backend.gen.model.LogoutResponseDto;
 import com.ybritto.teamtempo.backend.gen.model.RegisterUserDto;
 import com.ybritto.teamtempo.backend.gen.model.UserDto;
 import lombok.AllArgsConstructor;
@@ -34,5 +35,13 @@ public class AuthenticationController implements AuthApi {
         UserDto userDto = authenticationService.signup(registerUserDto);
         logger.info("GET /auth/signup - signup for {} executed successfully", userDto.getEmail());
         return ResponseEntity.ok(userDto);
+    }
+
+    @Override
+    public ResponseEntity<LogoutResponseDto> logout() {
+        logger.info("GET /auth/logout - Logging out user from the app");
+        LogoutResponseDto logoutResponseDto = authenticationService.logout();
+        logger.info("GET /auth/logout - User logged out successfully. {}", logoutResponseDto);
+        return ResponseEntity.ok(logoutResponseDto);
     }
 }

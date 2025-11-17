@@ -52,17 +52,11 @@ public class UserEntity implements UserDetails {
     @Column(name = "uuid", unique = true, nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(nullable = false, name = "first_name", length = 200)
-    @NotNull(message = "First name can not be null")
-    @NotEmpty(message = "First name can not be empty")
+    @Column(nullable = false, name = "name", length = 200)
+    @NotNull(message = "Name can not be null")
+    @NotEmpty(message = "Name can not be empty")
     @Size(min = 1, max = 200)
-    private String firstName;
-
-    @Column(nullable = false, name = "last_name", length = 200)
-    @NotNull(message = "Last name can not be null")
-    @NotEmpty(message = "Last name can not be empty")
-    @Size(min = 1, max = 200)
-    private String lastName;
+    private String name;
 
     @Column(name = "email", length = 1000, nullable = false, unique = true)
     @Email(message = "Email should be valid")
@@ -115,10 +109,6 @@ public class UserEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
-    }
-
-    public String getFullName() {
-        return this.getFirstName() + " " + this.getLastName();
     }
 
     @Override

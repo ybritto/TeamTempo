@@ -19,7 +19,7 @@ RegisterUserDto:
       type: string
     password:
       type: string
-    fullName:
+    name:
       type: string
 
 LoginUserDto:
