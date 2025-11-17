@@ -34,7 +34,7 @@ export class SignupComponent {
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
-    
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
@@ -49,7 +49,7 @@ export class SignupComponent {
       this.successMessage.set(null);
 
       const signupData: RegisterUserDto = {
-        fullName: this.signupForm.value.fullName,
+        name: this.signupForm.value.fullName,
         email: this.signupForm.value.email,
         password: this.signupForm.value.password
       };
@@ -64,8 +64,8 @@ export class SignupComponent {
         error: (error) => {
           this.isLoading.set(false);
           this.errorMessage.set(
-            error?.error?.detail || 
-            error?.error?.message || 
+            error?.error?.detail ||
+            error?.error?.message ||
             'Signup failed. Please try again.'
           );
         }

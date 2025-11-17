@@ -6,20 +6,34 @@
     [showLogoLink]="true" />
 
   <main class="dashboard-content">
-    <div class="team-selector-container">
-      <label for="team-select" class="team-selector-label">Select Team</label>
-      <select 
-        id="team-select"
-        class="team-selector"
-        [value]="selectedTeamId()"
-        (change)="onTeamChange($event)">
-        @for (team of teams(); track team.id) {
-          <option [value]="team.id">{{ team.name }}</option>
-        }
-      </select>
-    </div>
+    @if (loading()) {
+      <div class="loading-container">
+        <p>Loading teams...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-container">
+        <p>{{ error() }}</p>
+        <button (click)="loadTeams()">Retry</button>
+      </div>
+    } @else if (teams().length === 0) {
+      <div class="empty-container">
+        <p>No teams available.</p>
+      </div>
+    } @else {
+      <div class="team-selector-container">
+        <label for="team-select" class="team-selector-label">Select Team</label>
+        <select 
+          id="team-select"
+          class="team-selector"
+          [value]="selectedTeamId()"
+          (change)="onTeamChange($event)">
+          @for (team of teams(); track team.id) {
+            <option [value]="team.id">{{ team.name }}</option>
+          }
+        </select>
+      </div>
 
-    <div class="metrics-container">
+      <div class="metrics-container">
       <!-- Capacity Metric Card -->
       <div class="metric-card">
         <div class="metric-header">
@@ -92,6 +106,7 @@
         </div>
       </div>
     </div>
+    }
   </main>
 </div>
 

@@ -1,6 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../shared/header/header.component';
+import { TeamService } from '../../../api/api/team.service';
+import { TeamDto } from '../../../api/model/teamDto';
 
 interface Team {
   id: string;
@@ -18,63 +20,81 @@ interface Team {
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+  private teamService = inject(TeamService);
+
   navLinks = [
     { label: 'Home', route: '/' }
   ];
 
-  // Sample teams data - in a real app, this would come from a service
-  teams = signal<Team[]>([
-    {
-      id: '1',
-      name: 'Frontend Team',
-      capacityProjected: 120,
-      capacityPerformed: 105,
-      storyPointsProjected: 85,
-      storyPointsDelivered: 78
-    },
-    {
-      id: '2',
-      name: 'Backend Team',
-      capacityProjected: 150,
-      capacityPerformed: 145,
-      storyPointsProjected: 110,
-      storyPointsDelivered: 108
-    },
-    {
-      id: '3',
-      name: 'DevOps Team',
-      capacityProjected: 80,
-      capacityPerformed: 85,
-      storyPointsProjected: 60,
-      storyPointsDelivered: 65
-    },
-    {
-      id: '4',
-      name: 'QA Team',
-      capacityProjected: 100,
-      capacityPerformed: 95,
-      storyPointsProjected: 70,
-      storyPointsDelivered: 68
-    }
-  ]);
+  teams = signal<Team[]>([]);
+  loading = signal<boolean>(true);
+  error = signal<string | null>(null);
 
-  selectedTeamId = signal<string>(this.teams()[0].id);
+  selectedTeamId = signal<string>('');
+
+  constructor() {
+    this.loadTeams();
+  }
+
+  loadTeams(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    
+    this.teamService.myTeams().subscribe({
+      next: (teamDtos: TeamDto[]) => {
+        const teams = teamDtos.map(dto => this.mapTeamDtoToTeam(dto));
+        this.teams.set(teams);
+        
+        // Set the first team as selected if available
+        if (teams.length > 0 && !this.selectedTeamId()) {
+          this.selectedTeamId.set(teams[0].id);
+        }
+        
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading teams:', err);
+        this.error.set('Failed to load teams. Please try again later.');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private mapTeamDtoToTeam(dto: TeamDto): Team {
+    return {
+      id: dto.uuid || '',
+      name: dto.name || 'Unnamed Team',
+      // These metrics are not available in the API yet, setting defaults
+      capacityProjected: 0,
+      capacityPerformed: 0,
+      storyPointsProjected: 0,
+      storyPointsDelivered: 0
+    };
+  }
 
   selectedTeam = computed(() => {
-    return this.teams().find(team => team.id === this.selectedTeamId()) || this.teams()[0];
+    const teams = this.teams();
+    if (teams.length === 0) {
+      return null;
+    }
+    return teams.find(team => team.id === this.selectedTeamId()) || teams[0];
   });
 
-  capacityProjected = computed(() => this.selectedTeam().capacityProjected);
-  capacityPerformed = computed(() => this.selectedTeam().capacityPerformed);
-  storyPointsProjected = computed(() => this.selectedTeam().storyPointsProjected);
-  storyPointsDelivered = computed(() => this.selectedTeam().storyPointsDelivered);
+  capacityProjected = computed(() => this.selectedTeam()?.capacityProjected ?? 0);
+  capacityPerformed = computed(() => this.selectedTeam()?.capacityPerformed ?? 0);
+  storyPointsProjected = computed(() => this.selectedTeam()?.storyPointsProjected ?? 0);
+  storyPointsDelivered = computed(() => this.selectedTeam()?.storyPointsDelivered ?? 0);
 
   capacityPercentage = computed(() => {
-    return this.capacityPerformed() / this.capacityProjected() * 100;
+    const projected = this.capacityProjected();
+    if (projected === 0) return 0;
+    return this.capacityPerformed() / projected * 100;
   });
 
   storyPointsPercentage = computed(() => {
-    return this.storyPointsDelivered() / this.storyPointsProjected() * 100;
+    const projected = this.storyPointsProjected();
+    if (projected === 0) return 0;
+    return this.storyPointsDelivered() / projected * 100;
   });
 
   capacityDifference = computed(() => {

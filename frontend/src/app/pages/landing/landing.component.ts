@@ -1,7 +1,7 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, Signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../../shared/header/header.component';
+import { HeaderComponent, NavLink } from '../../shared/header/header.component';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
@@ -14,7 +14,7 @@ export class LandingComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  navLinks = computed(() => {
+  navLinks: Signal<NavLink[]> = computed(() => {
     if (this.authService.isAuthenticated()) {
       return [
         { label: 'Dashboard', route: '/dashboard' }
