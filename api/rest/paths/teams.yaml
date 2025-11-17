@@ -1,0 +1,38 @@
+post:
+  tags:
+    - teams
+  summary: Create a new team
+  description: Create a new team
+  operationId: createTeam
+  requestBody:
+    description: 'Team to create'
+    required: true
+    content:
+      'application/json':
+        schema:
+          $ref: '../schemas/team.yaml#/TeamDto'
+  responses:
+    '200':
+      description: 'Team successfully created'
+      content:
+        'application/json':
+          schema:
+            $ref: '../schemas/team.yaml#/TeamDto'
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"

@@ -19,6 +19,9 @@ paths:
     $ref: "./paths/auth-logout.yaml"
   /teams/my-teams:
     $ref: "./paths/teams-my-teams.yaml"
+  /teams:
+    $ref: "./paths/teams.yaml"
+
 
 
 components:
