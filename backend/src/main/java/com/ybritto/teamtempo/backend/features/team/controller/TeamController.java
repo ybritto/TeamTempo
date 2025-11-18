@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -42,5 +43,14 @@ public class TeamController implements TeamsApi {
         logger.info("PUT /teams/{} - Successfully updated team: {} with UUID: {}",
                 teamUuid, updatedTeam.getName(), updatedTeam.getUuid());
         return ResponseEntity.ok(updatedTeam);
+    }
+
+
+    @Override
+    public ResponseEntity<Void> deleteTeam(String uuid) {
+        logger.info("DELETE /teams/{} - Deleting team", uuid);
+        teamService.deleteTeam(uuid);
+        logger.info("DELETE /teams/{} - Successfully deleted team", uuid);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -32,6 +32,8 @@ export class TeamsComponent {
   editingTeamUuid = signal<string | null>(null);
   updating = signal<boolean>(false);
   updateError = signal<string | null>(null);
+  deletingTeamUuid = signal<string | null>(null);
+  deleteError = signal<string | null>(null);
 
   createTeamForm: FormGroup;
   editTeamForm: FormGroup;
@@ -177,6 +179,43 @@ export class TeamsComponent {
     } else {
       this.editTeamForm.markAllAsTouched();
     }
+  }
+
+  deleteTeam(team: TeamDto): void {
+    if (!team.uuid) {
+      console.error('Cannot delete team: UUID is missing');
+      return;
+    }
+
+    // Clear any previous errors
+    this.deleteError.set(null);
+
+    const teamName = team.name || 'this team';
+    const confirmed = confirm(`Are you sure you want to delete "${teamName}"? This action cannot be undone.`);
+    
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingTeamUuid.set(team.uuid);
+
+    this.teamsService.deleteTeam(team.uuid).subscribe({
+      next: () => {
+        // Reload teams list
+        this.loadTeams();
+        this.deletingTeamUuid.set(null);
+        this.deleteError.set(null);
+      },
+      error: (err) => {
+        console.error('Error deleting team:', err);
+        this.deleteError.set(
+          err?.error?.detail || 
+          err?.error?.message || 
+          'Failed to delete team. Please try again.'
+        );
+        this.deletingTeamUuid.set(null);
+      }
+    });
   }
 
   formatDate(dateString: string | undefined): string {

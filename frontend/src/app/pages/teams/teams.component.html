@@ -210,10 +210,22 @@
                 <div class="team-card-actions">
                   <button 
                     (click)="startEdit(team)" 
-                    class="edit-button">
+                    class="edit-button"
+                    [disabled]="deletingTeamUuid() === team.uuid">
                     Edit
                   </button>
+                  <button 
+                    (click)="deleteTeam(team)" 
+                    class="delete-button"
+                    [disabled]="deletingTeamUuid() === team.uuid">
+                    {{ deletingTeamUuid() === team.uuid ? 'Deleting...' : 'Delete' }}
+                  </button>
                 </div>
+                @if (deleteError() && deletingTeamUuid() === team.uuid) {
+                  <div class="error-message-container" style="margin-top: 1rem;">
+                    <p class="error-message">{{ deleteError() }}</p>
+                  </div>
+                }
               }
             </div>
           }

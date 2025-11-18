@@ -75,13 +75,25 @@ public class TeamService {
             throw new BadRequestException("Team uuid does not match the provided uuid");
         }
 
-        TeamEntity savedTeam = teamRepository.save(teamMapper.mapToEntity(teamDto, teamEntity.get().getId()));
-        TeamDto result = teamMapper.mapToDto(savedTeam);
+        TeamEntity entityToUpdate = teamMapper.mapToEntity(teamDto, teamEntity.get().getId()).toBuilder().user(getAuthenticatedUser()).build();
+        TeamDto result = teamMapper.mapToDto(teamRepository.save(entityToUpdate));
 
-        logger.info("Successfully updated team: {} with UUID: {}", savedTeam.getName(), savedTeam.getUuid());
-        logger.debug("Exiting method: updateTeam with result: team: {}", savedTeam.getName());
+        logger.info("Successfully updated team: {} with UUID: {}", result.getName(), result.getUuid());
+        logger.debug("Exiting method: updateTeam with result: team: {}", result.getName());
 
         return result;
+    }
+
+    public void deleteTeam(String teamUuid) {
+        logger.debug("Entering method: deleteTeam with uuid: {}", teamUuid);
+        UUID uuid = UUIDValidator.validateAndTransform(teamUuid);
+        TeamEntity teamToDelete = teamRepository.findByUuid(uuid)
+                .orElseThrow(() -> new NotFoundException("Team not found with uuid: " + teamUuid));
+
+        teamRepository.delete(teamToDelete);
+
+        logger.info("Successfully deleted team: {} with UUID: {}", teamToDelete.getName(), teamUuid);
+        logger.debug("Exiting method: deleteTeam with result: team: {}", teamToDelete.getName());
     }
 
     private UserEntity getAuthenticatedUser() {

@@ -6,7 +6,7 @@ put:
   operationId: updateTeam
   parameters:
     - in: path
-      name: teamUuid
+      name: uuid
       schema:
         type: string
       required: true
@@ -27,6 +27,47 @@ put:
             $ref: '../schemas/team.yaml#/TeamDto'
     '400':
       description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+
+delete:
+  tags:
+    - teams
+  summary: Delete a team by uuid
+  description: Delete a team by uuid
+  operationId: deleteTeam
+  parameters:
+    - in: path
+      name: uuid
+      schema:
+        type: string
+      required: true
+      description: "UUID of the team"
+  responses:
+    '204':
+      description: 'Team successfully deleted'
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '404':
+      description: 'Team not found'
       content:
         'application/problem+json':
           schema:
