@@ -18,15 +18,59 @@
     } @else {
       <div class="teams-header">
         <h1>My Teams</h1>
-        <button 
-          (click)="toggleCreateForm()" 
-          class="create-button"
-          [class.active]="showCreateForm()">
-          {{ showCreateForm() ? 'Cancel' : '+ Create Team' }}
-        </button>
+        <div class="header-actions">
+          @if (!selectionMode()) {
+            <button 
+              (click)="toggleSelectionMode()" 
+              class="selection-mode-button"
+              title="Enable selection mode to select multiple teams for bulk deletion">
+              <span class="button-icon">☑</span>
+              <span>Selection Mode</span>
+            </button>
+            <button 
+              (click)="toggleCreateForm()" 
+              class="create-button"
+              [class.active]="showCreateForm()">
+              {{ showCreateForm() ? 'Cancel' : '+ Create Team' }}
+            </button>
+          } @else {
+            <button 
+              (click)="toggleSelectionMode()" 
+              class="cancel-selection-button">
+              ✕ Cancel Selection
+            </button>
+          }
+        </div>
       </div>
 
-      @if (showCreateForm()) {
+      @if (selectionMode()) {
+        <div class="selection-bar">
+          <div class="selection-controls">
+            <label class="select-all-checkbox">
+              <input 
+                type="checkbox" 
+                [checked]="isAllSelected()"
+                (change)="toggleSelectAll()"
+                class="checkbox-input">
+              <span class="checkbox-label">Select All</span>
+            </label>
+            <span class="selection-count">{{ getSelectedCount() }} selected</span>
+          </div>
+          <button 
+            (click)="deleteSelectedTeams()" 
+            class="bulk-delete-button"
+            [disabled]="!isSomeSelected() || bulkDeleting()">
+            {{ bulkDeleting() ? 'Deleting...' : '🗑️ Delete Selected' }}
+          </button>
+        </div>
+        @if (bulkDeleteError()) {
+          <div class="error-message-container" style="margin-bottom: 1rem;">
+            <p class="error-message">{{ bulkDeleteError() }}</p>
+          </div>
+        }
+      }
+
+      @if (showCreateForm() && !selectionMode()) {
         <div class="create-form-container">
           <h2>Create New Team</h2>
           <form [formGroup]="createTeamForm" (ngSubmit)="onSubmit()" class="create-form">
@@ -108,7 +152,20 @@
       } @else {
         <div class="teams-list">
           @for (team of teams(); track team.uuid) {
-            <div class="team-card">
+            <div class="team-card" 
+                 [class.selected]="selectionMode() && isTeamSelected(team.uuid)"
+                 [class.selection-mode-active]="selectionMode()">
+              @if (selectionMode()) {
+                <div class="team-card-checkbox">
+                  <input 
+                    type="checkbox" 
+                    [checked]="isTeamSelected(team.uuid)"
+                    (change)="toggleTeamSelection(team.uuid)"
+                    class="checkbox-input"
+                    [id]="'team-checkbox-' + team.uuid">
+                  <label [for]="'team-checkbox-' + team.uuid" class="checkbox-label"></label>
+                </div>
+              }
               @if (editingTeamUuid() === team.uuid) {
                 <div class="edit-form-container">
                   <h2>Edit Team</h2>
@@ -207,20 +264,22 @@
                     </div>
                   }
                 </div>
-                <div class="team-card-actions">
-                  <button 
-                    (click)="startEdit(team)" 
-                    class="edit-button"
-                    [disabled]="deletingTeamUuid() === team.uuid">
-                    Edit
-                  </button>
-                  <button 
-                    (click)="deleteTeam(team)" 
-                    class="delete-button"
-                    [disabled]="deletingTeamUuid() === team.uuid">
-                    {{ deletingTeamUuid() === team.uuid ? 'Deleting...' : 'Delete' }}
-                  </button>
-                </div>
+                @if (!selectionMode()) {
+                  <div class="team-card-actions">
+                    <button 
+                      (click)="startEdit(team)" 
+                      class="edit-button"
+                      [disabled]="deletingTeamUuid() === team.uuid">
+                      Edit
+                    </button>
+                    <button 
+                      (click)="deleteTeam(team)" 
+                      class="delete-button"
+                      [disabled]="deletingTeamUuid() === team.uuid">
+                      {{ deletingTeamUuid() === team.uuid ? 'Deleting...' : 'Delete' }}
+                    </button>
+                  </div>
+                }
                 @if (deleteError() && deletingTeamUuid() === team.uuid) {
                   <div class="error-message-container" style="margin-top: 1rem;">
                     <p class="error-message">{{ deleteError() }}</p>

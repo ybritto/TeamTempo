@@ -36,3 +36,40 @@ post:
         'application/problem+json':
           schema:
             $ref: "../schemas/common.yaml#/ProblemDto"
+
+delete:
+  tags:
+    - teams
+  summary: Delete selected teams
+  description: Delete selected teams
+  operationId: deleteSelectedTeams
+  requestBody:
+    description: 'List of Team UUID to be deleted'
+    required: true
+    content:
+      'application/json':
+        schema:
+          type: array
+          items:
+            type: string
+  responses:
+    '204':
+      description: Teams deleted successfully
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"

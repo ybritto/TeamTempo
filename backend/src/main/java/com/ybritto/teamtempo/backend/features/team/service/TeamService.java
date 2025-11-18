@@ -106,4 +106,21 @@ public class TeamService {
         // The principal is set to UserEntity in JwtAuthenticationFilter
         return (UserEntity) authentication.getPrincipal();
     }
+
+    public void deleteSelectedTeams(List<String> teamUuidList) {
+        logger.debug("Entering method: deleteSelectedTeams with count: {}", teamUuidList.size());
+        List<UUID> uuidList = UUIDValidator.validateAndTransform(teamUuidList);
+        List<TeamEntity> teamsToDelete = teamRepository.findByUuidIn(uuidList);
+
+        if (teamsToDelete.size() != teamUuidList.size()) {
+            logger.warn("Some teams not found for deletion. Requested: {}, Found: {}",
+                    teamUuidList.size(), teamsToDelete.size());
+        }
+
+        // TODO - Change this for logical deletion by deactivating it
+        teamRepository.deleteAllById(teamsToDelete.stream().map(TeamEntity::getId).toList());
+
+        logger.info("Successfully deleted {} teams", teamsToDelete.size());
+        logger.debug("Exiting method: deleteSelectedTeams with result: {} teams deleted", teamsToDelete.size());
+    }
 }

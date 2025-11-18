@@ -53,4 +53,12 @@ public class TeamController implements TeamsApi {
         logger.info("DELETE /teams/{} - Successfully deleted team", uuid);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<Void> deleteSelectedTeams(List<String> teamUuids) {
+        logger.info("DELETE /api/v1/teams - Deleting {} selected teams", teamUuids.size());
+        teamService.deleteSelectedTeams(teamUuids);
+        logger.info("DELETE /api/v1/teams - Successfully deleted {} selected teams", teamUuids.size());
+        return ResponseEntity.noContent().build();
+    }
 }

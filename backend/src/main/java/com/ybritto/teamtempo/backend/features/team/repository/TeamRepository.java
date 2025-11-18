@@ -15,4 +15,6 @@ public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
     List<TeamEntity> findByUser(UserEntity user);
 
     Optional<TeamEntity> findByUuid(UUID uuid);
+
+    List<TeamEntity> findByUuidIn(List<UUID> uuidList);
 }
