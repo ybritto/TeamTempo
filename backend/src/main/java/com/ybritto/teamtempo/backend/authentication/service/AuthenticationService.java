@@ -55,12 +55,12 @@ public class AuthenticationService {
     }
 
     public UserDto signup(RegisterUserDto registerUserDto) {
+        UserEntity entity = authenticationMapper.mapEntity(
+                registerUserDto, passwordEncoder.encode(registerUserDto.getPassword()));
         return authenticationMapper.mapDto(
-                userRepository.save(
-                        authenticationMapper.mapEntity(
-                                registerUserDto,passwordEncoder.encode(registerUserDto.getPassword())
-                        )
-                )
+                userRepository.save(entity
+                        .toBuilder()
+                        .enabled(true).build())
         );
     }
 
