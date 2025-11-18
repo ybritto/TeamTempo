@@ -109,25 +109,112 @@
         <div class="teams-list">
           @for (team of teams(); track team.uuid) {
             <div class="team-card">
-              <div class="team-card-header">
-                <h3 class="team-name">{{ team.name || 'Unnamed Team' }}</h3>
-                <span class="team-uuid">{{ team.uuid }}</span>
-              </div>
-              @if (team.description) {
-                <p class="team-description">{{ team.description }}</p>
-              }
-              <div class="team-dates">
-                <div class="date-item">
-                  <span class="date-label">Start:</span>
-                  <span class="date-value">{{ formatDate(team.startDate) }}</span>
+              @if (editingTeamUuid() === team.uuid) {
+                <div class="edit-form-container">
+                  <h2>Edit Team</h2>
+                  <form [formGroup]="editTeamForm" (ngSubmit)="onUpdate()" class="edit-form">
+                    <div class="form-group">
+                      <label for="edit-name">Team Name *</label>
+                      <input 
+                        type="text" 
+                        id="edit-name" 
+                        formControlName="name"
+                        class="form-input"
+                        [class.error]="editTeamForm.get('name')?.invalid && editTeamForm.get('name')?.touched"
+                        placeholder="Enter team name">
+                      @if (editTeamForm.get('name')?.invalid && editTeamForm.get('name')?.touched) {
+                        <span class="error-message">Team name is required (max 200 characters)</span>
+                      }
+                    </div>
+
+                    <div class="form-group">
+                      <label for="edit-description">Description</label>
+                      <textarea 
+                        id="edit-description" 
+                        formControlName="description"
+                        class="form-textarea"
+                        rows="4"
+                        placeholder="Enter team description (optional)"></textarea>
+                      @if (editTeamForm.get('description')?.invalid && editTeamForm.get('description')?.touched) {
+                        <span class="error-message">Description must be less than 1000 characters</span>
+                      }
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="edit-startDate">Start Date *</label>
+                        <input 
+                          type="date" 
+                          id="edit-startDate" 
+                          formControlName="startDate"
+                          class="form-input"
+                          [class.error]="editTeamForm.get('startDate')?.invalid && editTeamForm.get('startDate')?.touched">
+                        @if (editTeamForm.get('startDate')?.invalid && editTeamForm.get('startDate')?.touched) {
+                          <span class="error-message">Start date is required</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label for="edit-endDate">End Date</label>
+                        <input 
+                          type="date" 
+                          id="edit-endDate" 
+                          formControlName="endDate"
+                          class="form-input"
+                          placeholder="Optional">
+                      </div>
+                    </div>
+
+                    @if (updateError()) {
+                      <div class="error-message-container">
+                        <p class="error-message">{{ updateError() }}</p>
+                      </div>
+                    }
+
+                    <div class="form-actions">
+                      <button 
+                        type="button" 
+                        (click)="cancelEdit()"
+                        class="cancel-button">
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit" 
+                        class="submit-button"
+                        [disabled]="updating() || editTeamForm.invalid">
+                        {{ updating() ? 'Updating...' : 'Update Team' }}
+                      </button>
+                    </div>
+                  </form>
                 </div>
-                @if (team.endDate) {
-                  <div class="date-item">
-                    <span class="date-label">End:</span>
-                    <span class="date-value">{{ formatDate(team.endDate) }}</span>
-                  </div>
+              } @else {
+                <div class="team-card-header">
+                  <h3 class="team-name">{{ team.name || 'Unnamed Team' }}</h3>
+                  <span class="team-uuid">{{ team.uuid }}</span>
+                </div>
+                @if (team.description) {
+                  <p class="team-description">{{ team.description }}</p>
                 }
-              </div>
+                <div class="team-dates">
+                  <div class="date-item">
+                    <span class="date-label">Start:</span>
+                    <span class="date-value">{{ formatDate(team.startDate) }}</span>
+                  </div>
+                  @if (team.endDate) {
+                    <div class="date-item">
+                      <span class="date-label">End:</span>
+                      <span class="date-value">{{ formatDate(team.endDate) }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="team-card-actions">
+                  <button 
+                    (click)="startEdit(team)" 
+                    class="edit-button">
+                    Edit
+                  </button>
+                </div>
+              }
             </div>
           }
         </div>
