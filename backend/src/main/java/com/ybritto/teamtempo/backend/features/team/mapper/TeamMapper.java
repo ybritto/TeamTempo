@@ -4,6 +4,7 @@ import com.ybritto.teamtempo.backend.core.mapper.CommonsMapper;
 import com.ybritto.teamtempo.backend.features.team.entity.TeamEntity;
 import com.ybritto.teamtempo.backend.gen.model.TeamDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
 
 import java.util.List;
@@ -13,6 +14,13 @@ import java.util.List;
         uses = {CommonsMapper.class})
 public interface TeamMapper {
 
-    List<TeamDto> mapToDtoList(List<TeamEntity> teams);
+    List<TeamDto> mapToDtoList(List<TeamEntity> entityList);
 
+    TeamDto mapToDto(TeamEntity entity);
+
+    @Mapping(target = "id", ignore = true)
+    TeamEntity mapToEntity(TeamDto dto);
+
+    @Mapping(target = "id", source = "id")
+    TeamEntity mapToEntity(TeamDto teamDto, Long id);
 }

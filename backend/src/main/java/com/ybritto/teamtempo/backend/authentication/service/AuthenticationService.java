@@ -9,6 +9,8 @@ import com.ybritto.teamtempo.backend.gen.model.LogoutResponseDto;
 import com.ybritto.teamtempo.backend.gen.model.RegisterUserDto;
 import com.ybritto.teamtempo.backend.gen.model.UserDto;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,8 @@ import java.time.OffsetDateTime;
 @Service
 @AllArgsConstructor
 public class AuthenticationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -50,21 +54,28 @@ public class AuthenticationService {
 
 
     public LoginResponseDto login(LoginUserDto loginUserDto) {
+        logger.info("Authenticating user with email: {}", loginUserDto.getEmail());
         UserEntity authenticatedUser = this.authenticate(loginUserDto);
-        return authenticationMapper.mapDto(authenticatedUser, jwtService.generateToken(authenticatedUser), jwtService.getExpirationTime());
+        LoginResponseDto response = authenticationMapper.mapDto(authenticatedUser, jwtService.generateToken(authenticatedUser), jwtService.getExpirationTime());
+        logger.info("User {} authenticated successfully", authenticatedUser.getEmail());
+        return response;
     }
 
     public UserDto signup(RegisterUserDto registerUserDto) {
+        logger.info("Registering new user: {} with email: {}", registerUserDto.getName(), registerUserDto.getEmail());
         UserEntity entity = authenticationMapper.mapEntity(
                 registerUserDto, passwordEncoder.encode(registerUserDto.getPassword()));
-        return authenticationMapper.mapDto(
+        UserDto userDto = authenticationMapper.mapDto(
                 userRepository.save(entity
                         .toBuilder()
                         .enabled(true).build())
         );
+        logger.info("User {} registered successfully with email: {}", userDto.getName(), userDto.getEmail());
+        return userDto;
     }
 
     public LogoutResponseDto logout() {
+        logger.info("Logging out user");
         // Clear the security context
         SecurityContextHolder.clearContext();
 
@@ -73,6 +84,7 @@ public class AuthenticationService {
         logoutResponse.setMessage("User successfully logged out");
         logoutResponse.setTimestamp(OffsetDateTime.now());
 
+        logger.info("User logged out successfully");
         return logoutResponse;
     }
 }

@@ -34,6 +34,7 @@ public class GlobalRestExceptionHandler {
 
     // Business validations
     EXCEPTIONS_MAPPING.put(InvalidParameterException.class, HttpStatus.BAD_REQUEST);
+    EXCEPTIONS_MAPPING.put(NotFoundException.class, HttpStatus.NOT_FOUND);
 
     // Entity validations
     EXCEPTIONS_MAPPING.put(EntityValidationException.class, HttpStatus.UNPROCESSABLE_ENTITY);

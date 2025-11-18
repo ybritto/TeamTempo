@@ -22,7 +22,7 @@ CREATE TABLE team
     NAME        varchar(200)  NOT NULL,
     DESCRIPTION varchar(1000) NOT NULL,
     START_DATE  DATE          NOT NULL,
-    END_DATE    DATE          NOT NULL,
+    END_DATE    DATE,
     APP_USER_ID int           NOT NULL,
 
     CREATED_AT timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,

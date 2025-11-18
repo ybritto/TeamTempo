@@ -1,0 +1,45 @@
+put:
+  tags:
+    - teams
+  summary: Update an existing team
+  description: Update an existing team by uuid
+  operationId: updateTeam
+  parameters:
+    - in: path
+      name: teamUuid
+      schema:
+        type: string
+      required: true
+      description: "UUID of the team"
+  requestBody:
+    description: 'Team to update'
+    required: true
+    content:
+      'application/json':
+        schema:
+          $ref: '../schemas/team.yaml#/TeamDto'
+  responses:
+    '200':
+      description: 'Team successfully updated'
+      content:
+        'application/json':
+          schema:
+            $ref: '../schemas/team.yaml#/TeamDto'
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"

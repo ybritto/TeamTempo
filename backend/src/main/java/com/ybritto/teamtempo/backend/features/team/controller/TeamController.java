@@ -25,4 +25,22 @@ public class TeamController implements TeamsApi {
         logger.info("GET /auth/my-teams - {} teams returned", dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
+
+    @Override
+    public ResponseEntity<TeamDto> createTeam(TeamDto teamDto) {
+        logger.info("POST /teams - Creating team: {}", teamDto.getName());
+        TeamDto createdTeam = teamService.createTeam(teamDto);
+        logger.info("POST /teams - Successfully created team: {} with UUID: {}",
+                createdTeam.getName(), createdTeam.getUuid());
+        return ResponseEntity.ok(createdTeam);
+    }
+
+    @Override
+    public ResponseEntity<TeamDto> updateTeam(String teamUuid, TeamDto teamDto) {
+        logger.info("PUT /teams/{} - Updating team: {}", teamUuid, teamDto.getName());
+        TeamDto updatedTeam = teamService.updateTeam(teamUuid, teamDto);
+        logger.info("PUT /teams/{} - Successfully updated team: {} with UUID: {}",
+                teamUuid, updatedTeam.getName(), updatedTeam.getUuid());
+        return ResponseEntity.ok(updatedTeam);
+    }
 }
