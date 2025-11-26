@@ -1,13 +1,14 @@
 package com.ybritto.teamtempo.backend.features.team.controller;
 
+import com.ybritto.teamtempo.backend.features.project.ProjectService;
 import com.ybritto.teamtempo.backend.features.team.service.TeamService;
 import com.ybritto.teamtempo.backend.gen.api.TeamsApi;
+import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
 import com.ybritto.teamtempo.backend.gen.model.TeamDto;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class TeamController implements TeamsApi {
 
     private static final Logger logger = LoggerFactory.getLogger(TeamController.class);
     private TeamService teamService;
+    private ProjectService projectService;
 
     @Override
     public ResponseEntity<List<TeamDto>> myTeams() {
@@ -60,5 +62,13 @@ public class TeamController implements TeamsApi {
         teamService.deleteSelectedTeams(teamUuids);
         logger.info("DELETE /api/v1/teams - Successfully deleted {} selected teams", teamUuids.size());
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<List<ProjectDto>> getTeamProjects(String uuid) {
+        logger.info("GET /teams/{}/projects - Projects for the team",  uuid);
+        List<ProjectDto> dtoList = projectService.getProejctsByTeamUuid(uuid);
+        logger.info("GET /teams/{}/projects - {} Projects found",  uuid, dtoList.size());
+        return ResponseEntity.ok(dtoList);
     }
 }

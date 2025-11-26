@@ -23,7 +23,10 @@ paths:
     $ref: "./paths/teams.yaml"
   /teams/{uuid}:
     $ref: "./paths/teams-by-uuid.yaml"
-
+  /teams/{uuid}/projects:
+    $ref: "./paths/teams-by-uuid-projects.yaml"
+  /projects/{uuid}:
+    $ref: "./paths/projects-by-uuid.yaml"
 
 
 components:

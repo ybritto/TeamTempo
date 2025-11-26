@@ -1,0 +1,86 @@
+put:
+  tags:
+    - projects
+  summary: Update an existing project
+  description: Update an existing project by uuid
+  operationId: updateProject
+  parameters:
+    - in: path
+      name: uuid
+      schema:
+        type: string
+      required: true
+      description: "UUID of the project"
+  requestBody:
+    description: 'Project to update'
+    required: true
+    content:
+      'application/json':
+        schema:
+          $ref: '../schemas/project.yaml#/ProjectDto'
+  responses:
+    '200':
+      description: 'Project successfully updated'
+      content:
+        'application/json':
+          schema:
+            $ref: '../schemas/project.yaml#/ProjectDto'
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+
+delete:
+  tags:
+    - projects
+  summary: Delete a project by uuid
+  description: Delete a project by uuid
+  operationId: deleteProject
+  parameters:
+    - in: path
+      name: uuid
+      schema:
+        type: string
+      required: true
+      description: "UUID of the project"
+  responses:
+    '204':
+      description: 'Project successfully deleted'
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '404':
+      description: 'Project not found'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"

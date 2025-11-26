@@ -8,13 +8,31 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.NullValueMappingStrategy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mapper(componentModel = "spring",
         nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
         uses = {CommonsMapper.class})
 public interface ProjectMapper {
 
-    @Named("mapProjectWithoutTeam")
+    default List<ProjectDto> mapToDtoListWithoutTeam(List<ProjectEntity> allByTeam) {
+        if ( allByTeam == null ) {
+            return new ArrayList<>();
+        }
+
+        List<ProjectDto> list = new ArrayList<>( allByTeam.size() );
+        for ( ProjectEntity projectEntity : allByTeam ) {
+            list.add( mapToDtoWithoutTeam( projectEntity ) );
+        }
+
+        return list;
+    }
+
+    @Named("mapToDtoWithoutTeam")
     @Mapping(target = "team", ignore = true)
     ProjectDto mapToDtoWithoutTeam(ProjectEntity entity);
+
+
 
 }

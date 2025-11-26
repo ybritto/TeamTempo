@@ -17,7 +17,7 @@ public interface TeamMapper {
 
     List<TeamDto> mapToDtoList(List<TeamEntity> entityList);
 
-    @Mapping(target = "projects", qualifiedByName = "mapProjectWithoutTeam")
+    @Mapping(target = "projects", qualifiedByName = "mapToDtoWithoutTeam")
     TeamDto mapToDto(TeamEntity entity);
 
     @Mapping(target = "id", ignore = true)

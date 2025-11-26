@@ -1,0 +1,41 @@
+get:
+  tags:
+    - teams
+  summary: Get all projects for a team
+  description: Retrieve all projects associated with a specific team by team UUID
+  operationId: getTeamProjects
+  parameters:
+    - in: path
+      name: uuid
+      schema:
+        type: string
+      required: true
+      description: "UUID of the team"
+  responses:
+    '200':
+      description: 'Projects retrieved successfully'
+      content:
+        'application/json':
+          schema:
+            type: array
+            items:
+              $ref: '../schemas/project.yaml#/ProjectDto'
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '404':
+      description: 'Team not found'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+

@@ -2,7 +2,7 @@ import {Component, inject, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {HeaderComponent} from '../../shared/header/header.component';
-import {TeamService, TeamsService, TeamDto} from '../../../api';
+import {TeamService, TeamsService, ProjectsService, TeamDto, ProjectDto} from '../../../api';
 
 @Component({
   selector: 'app-teams',
@@ -13,6 +13,7 @@ import {TeamService, TeamsService, TeamDto} from '../../../api';
 export class TeamsComponent {
   private teamService = inject(TeamService);
   private teamsService = inject(TeamsService);
+  private projectsService = inject(ProjectsService);
   private fb = inject(FormBuilder);
 
   navLinks = [
@@ -35,6 +36,16 @@ export class TeamsComponent {
   selectedTeamUuids = signal<Set<string>>(new Set());
   bulkDeleting = signal<boolean>(false);
   bulkDeleteError = signal<string | null>(null);
+  
+  // Projects management
+  expandedTeamUuid = signal<string | null>(null);
+  teamProjects = signal<Map<string, ProjectDto[]>>(new Map());
+  loadingProjects = signal<Set<string>>(new Set());
+  projectsError = signal<Map<string, string>>(new Map());
+  editingProjectUuid = signal<string | null>(null);
+  updatingProject = signal<boolean>(false);
+  updateProjectError = signal<string | null>(null);
+  editProjectForm: FormGroup;
 
   createTeamForm: FormGroup;
   editTeamForm: FormGroup;
@@ -47,6 +58,12 @@ export class TeamsComponent {
       endDate: ['']
     });
     this.editTeamForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
+      description: ['', [Validators.maxLength(1000)]],
+      startDate: ['', [Validators.required]],
+      endDate: ['']
+    });
+    this.editProjectForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
       description: ['', [Validators.maxLength(1000)]],
       startDate: ['', [Validators.required]],
@@ -324,6 +341,186 @@ export class TeamsComponent {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  toggleProjects(team: TeamDto): void {
+    if (!team.uuid) return;
+
+    const currentExpanded = this.expandedTeamUuid();
+    
+    // If clicking the same team, collapse it
+    if (currentExpanded === team.uuid) {
+      this.expandedTeamUuid.set(null);
+      return;
+    }
+
+    // Expand the clicked team
+    this.expandedTeamUuid.set(team.uuid);
+
+    // Load projects if not already loaded
+    const projects = this.teamProjects().get(team.uuid);
+    if (!projects && !this.loadingProjects().has(team.uuid || '')) {
+      this.loadProjects(team.uuid);
+    }
+  }
+
+  isProjectsExpanded(teamUuid: string | undefined): boolean {
+    if (!teamUuid) return false;
+    return this.expandedTeamUuid() === teamUuid;
+  }
+
+  loadProjects(teamUuid: string): void {
+    if (this.loadingProjects().has(teamUuid)) return;
+
+    this.loadingProjects.update(loading => {
+      const newSet = new Set(loading);
+      newSet.add(teamUuid);
+      return newSet;
+    });
+
+    // Clear any previous error for this team
+    this.projectsError.update(errors => {
+      const newMap = new Map(errors);
+      newMap.delete(teamUuid);
+      return newMap;
+    });
+
+    this.teamsService.getTeamProjects(teamUuid).subscribe({
+      next: (projects: ProjectDto[]) => {
+        this.teamProjects.update(projectsMap => {
+          const newMap = new Map(projectsMap);
+          newMap.set(teamUuid, projects);
+          return newMap;
+        });
+        this.loadingProjects.update(loading => {
+          const newSet = new Set(loading);
+          newSet.delete(teamUuid);
+          return newSet;
+        });
+      },
+      error: (err) => {
+        console.error('Error loading projects:', err);
+        this.projectsError.update(errors => {
+          const newMap = new Map(errors);
+          newMap.set(teamUuid, err?.error?.detail || err?.error?.message || 'Failed to load projects. Please try again.');
+          return newMap;
+        });
+        this.loadingProjects.update(loading => {
+          const newSet = new Set(loading);
+          newSet.delete(teamUuid);
+          return newSet;
+        });
+      }
+    });
+  }
+
+  getTeamProjects(teamUuid: string | undefined): ProjectDto[] {
+    if (!teamUuid) return [];
+    return this.teamProjects().get(teamUuid) || [];
+  }
+
+  isLoadingProjects(teamUuid: string | undefined): boolean {
+    if (!teamUuid) return false;
+    return this.loadingProjects().has(teamUuid);
+  }
+
+  getProjectsError(teamUuid: string | undefined): string | null {
+    if (!teamUuid) return null;
+    return this.projectsError().get(teamUuid) || null;
+  }
+
+  startEditProject(project: ProjectDto, teamUuid: string): void {
+    if (!project.uuid) return;
+    
+    this.editingProjectUuid.set(project.uuid);
+    this.updateProjectError.set(null);
+
+    // Format dates for input fields (YYYY-MM-DD)
+    const formatDateForInput = (dateString: string | undefined): string => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    this.editProjectForm.patchValue({
+      name: project.name || '',
+      description: project.description || '',
+      startDate: formatDateForInput(project.startDate),
+      endDate: formatDateForInput(project.endDate)
+    });
+  }
+
+  cancelEditProject(): void {
+    this.editingProjectUuid.set(null);
+    this.editProjectForm.reset();
+    this.updateProjectError.set(null);
+  }
+
+  onUpdateProject(teamUuid: string): void {
+    if (this.editProjectForm.valid && this.editingProjectUuid()) {
+      this.updatingProject.set(true);
+      this.updateProjectError.set(null);
+
+      const projectUuid = this.editingProjectUuid()!;
+      
+      // Get the current project to preserve team reference
+      const currentProjects = this.teamProjects().get(teamUuid) || [];
+      const currentProject = currentProjects.find(p => p.uuid === projectUuid);
+      
+      if (!currentProject) {
+        this.updateProjectError.set('Project not found');
+        this.updatingProject.set(false);
+        return;
+      }
+
+      const projectData: ProjectDto = {
+        uuid: projectUuid,
+        name: this.editProjectForm.value.name,
+        description: this.editProjectForm.value.description || undefined,
+        startDate: this.editProjectForm.value.startDate,
+        endDate: this.editProjectForm.value.endDate || undefined,
+        team: currentProject.team // Preserve team reference
+      };
+
+      this.projectsService.updateProject(projectUuid, projectData).subscribe({
+        next: (updatedProject: ProjectDto) => {
+          // Update the project in the cached projects list
+          this.teamProjects.update(projectsMap => {
+            const newMap = new Map(projectsMap);
+            const projects = newMap.get(teamUuid) || [];
+            const updatedProjects = projects.map(p => 
+              p.uuid === projectUuid ? updatedProject : p
+            );
+            newMap.set(teamUuid, updatedProjects);
+            return newMap;
+          });
+          
+          // Reset form and hide it
+          this.editProjectForm.reset();
+          this.editingProjectUuid.set(null);
+          this.updatingProject.set(false);
+        },
+        error: (err) => {
+          console.error('Error updating project:', err);
+          this.updateProjectError.set(
+            err?.error?.detail ||
+            err?.error?.message ||
+            'Failed to update project. Please try again.'
+          );
+          this.updatingProject.set(false);
+        }
+      });
+    } else {
+      this.editProjectForm.markAllAsTouched();
+    }
+  }
+
+  isEditingProject(projectUuid: string | undefined): boolean {
+    if (!projectUuid) return false;
+    return this.editingProjectUuid() === projectUuid;
   }
 }
 
