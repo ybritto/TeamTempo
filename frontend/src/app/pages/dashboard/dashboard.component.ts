@@ -4,8 +4,19 @@ import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../../shared/header/header.component';
 import { TeamService } from '../../../api/api/team.service';
 import { TeamDto } from '../../../api/model/teamDto';
+import { ProjectDto } from '../../../api/model/projectDto';
 
 interface Team {
+  id: string;
+  name: string;
+  capacityProjected: number;
+  capacityPerformed: number;
+  storyPointsProjected: number;
+  storyPointsDelivered: number;
+  projects: ProjectDto[];
+}
+
+interface Project {
   id: string;
   name: string;
   capacityProjected: number;
@@ -33,6 +44,7 @@ export class DashboardComponent {
   error = signal<string | null>(null);
 
   selectedTeamId = signal<string>('');
+  selectedProjectId = signal<string>('');
 
   constructor() {
     this.loadTeams();
@@ -49,7 +61,13 @@ export class DashboardComponent {
         
         // Set the first team as selected if available
         if (teams.length > 0 && !this.selectedTeamId()) {
-          this.selectedTeamId.set(teams[0].id);
+          const firstTeam = teams[0];
+          this.selectedTeamId.set(firstTeam.id);
+          
+          // Set the first project as selected if available
+          if (firstTeam.projects.length > 0) {
+            this.selectedProjectId.set(firstTeam.projects[0].uuid || '');
+          }
         }
         
         this.loading.set(false);
@@ -70,7 +88,8 @@ export class DashboardComponent {
       capacityProjected: 0,
       capacityPerformed: 0,
       storyPointsProjected: 0,
-      storyPointsDelivered: 0
+      storyPointsDelivered: 0,
+      projects: dto.projects || []
     };
   }
 
@@ -82,10 +101,36 @@ export class DashboardComponent {
     return teams.find(team => team.id === this.selectedTeamId()) || teams[0];
   });
 
-  capacityProjected = computed(() => this.selectedTeam()?.capacityProjected ?? 0);
-  capacityPerformed = computed(() => this.selectedTeam()?.capacityPerformed ?? 0);
-  storyPointsProjected = computed(() => this.selectedTeam()?.storyPointsProjected ?? 0);
-  storyPointsDelivered = computed(() => this.selectedTeam()?.storyPointsDelivered ?? 0);
+  availableProjects = computed(() => {
+    const team = this.selectedTeam();
+    return team?.projects || [];
+  });
+
+  selectedProject = computed(() => {
+    const projects = this.availableProjects();
+    const selectedId = this.selectedProjectId();
+    if (!selectedId || projects.length === 0) {
+      return null;
+    }
+    const projectDto = projects.find(p => p.uuid === selectedId);
+    if (!projectDto) return null;
+    
+    // Map ProjectDto to Project interface
+    // Note: Project metrics are not available in the API yet, using defaults
+    return {
+      id: projectDto.uuid || '',
+      name: projectDto.name || 'Unnamed Project',
+      capacityProjected: 0,
+      capacityPerformed: 0,
+      storyPointsProjected: 0,
+      storyPointsDelivered: 0
+    };
+  });
+
+  capacityProjected = computed(() => this.selectedProject()?.capacityProjected ?? 0);
+  capacityPerformed = computed(() => this.selectedProject()?.capacityPerformed ?? 0);
+  storyPointsProjected = computed(() => this.selectedProject()?.storyPointsProjected ?? 0);
+  storyPointsDelivered = computed(() => this.selectedProject()?.storyPointsDelivered ?? 0);
 
   capacityPercentage = computed(() => {
     const projected = this.capacityProjected();
@@ -109,7 +154,22 @@ export class DashboardComponent {
 
   onTeamChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
-    this.selectedTeamId.set(selectElement.value);
+    const teamId = selectElement.value;
+    this.selectedTeamId.set(teamId);
+    
+    // Reset project selection when team changes
+    // Access projects directly from teams array to avoid timing issues with computed
+    const team = this.teams().find(t => t.id === teamId);
+    if (team && team.projects.length > 0) {
+      this.selectedProjectId.set(team.projects[0].uuid || '');
+    } else {
+      this.selectedProjectId.set('');
+    }
+  }
+
+  onProjectChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedProjectId.set(selectElement.value);
   }
 }
 

@@ -1,7 +1,7 @@
 <div class="dashboard-container">
-  <app-header 
+  <app-header
     title="Dashboard"
-    [logoWithTagline]="false" 
+    [logoWithTagline]="false"
     [navLinks]="navLinks"
     [showLogoLink]="true" />
 
@@ -20,18 +20,46 @@
         <p>No teams available.</p>
       </div>
     } @else {
-      <div class="team-selector-container">
-        <label for="team-select" class="team-selector-label">Select Team</label>
-        <select 
-          id="team-select"
-          class="team-selector"
-          [value]="selectedTeamId()"
-          (change)="onTeamChange($event)">
-          @for (team of teams(); track team.id) {
-            <option [value]="team.id">{{ team.name }}</option>
-          }
-        </select>
-        <a routerLink="/teams" class="create-team-link">Can't see your team? Try create</a>
+      <div class="selectors-container">
+        <div class="team-selector-container">
+          <label for="team-select" class="selector-label">Select Team</label>
+          <select
+            id="team-select"
+            class="selector"
+            [value]="selectedTeamId()"
+            (change)="onTeamChange($event)">
+            @for (team of teams(); track team.id) {
+              <option [value]="team.id">{{ team.name }}</option>
+            }
+          </select>
+        </div>
+
+        @if (availableProjects().length > 0) {
+          <div class="project-selector-container">
+            <label for="project-select" class="selector-label">Select Project</label>
+            <select
+              id="project-select"
+              class="selector"
+              [value]="selectedProjectId()"
+              (change)="onProjectChange($event)">
+              @for (project of availableProjects(); track project.uuid) {
+                <option [value]="project.uuid">{{ project.name || 'Unnamed Project' }}</option>
+              }
+            </select>
+          </div>
+        } @else {
+          <div class="project-selector-container">
+            <label for="project-select" class="selector-label">Select Project</label>
+            <select
+              id="project-select"
+              class="selector"
+              disabled>
+              <option>No projects available</option>
+            </select>
+          </div>
+        }
+
+        <a routerLink="/teams" class="manage-link">Something Missing? Manage Teams & Projects</a>
       </div>
 
       <div class="metrics-container">
@@ -54,8 +82,8 @@
           </div>
           <div class="metric-progress">
             <div class="progress-bar">
-              <div 
-                class="progress-fill" 
+              <div
+                class="progress-fill"
                 [style.width.%]="capacityPercentage()"
                 [class.over]="capacityPercentage() > 100"
                 [class.under]="capacityPercentage() < 100"
@@ -90,8 +118,8 @@
           </div>
           <div class="metric-progress">
             <div class="progress-bar">
-              <div 
-                class="progress-fill" 
+              <div
+                class="progress-fill"
                 [style.width.%]="storyPointsPercentage()"
                 [class.over]="storyPointsPercentage() > 100"
                 [class.under]="storyPointsPercentage() < 100"
