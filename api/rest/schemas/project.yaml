@@ -1,4 +1,4 @@
-TeamDto:
+ProjectDto:
   description: Representation of the team in the system
   type: object
   properties:
@@ -8,13 +8,11 @@ TeamDto:
       type: string
     description:
       type: string
+    team:
+      $ref: './team.yaml#/TeamDto'
     startDate:
       type: string
       format: date
     endDate:
       type: string
       format: date
-    projects:
-      type: array
-      items:
-        $ref: './project.yaml#/ProjectDto'
