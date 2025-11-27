@@ -34,5 +34,11 @@ public interface ProjectMapper {
     ProjectDto mapToDtoWithoutTeam(ProjectEntity entity);
 
 
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "team", ignore = true)
+    ProjectEntity mapToEntity(ProjectDto projectDto, Long id);
 
 }

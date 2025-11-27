@@ -21,8 +21,18 @@ public interface TeamMapper {
     TeamDto mapToDto(TeamEntity entity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "projects", ignore = true)
     TeamEntity mapToEntity(TeamDto dto);
 
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "projects", ignore = true)
     TeamEntity mapToEntity(TeamDto teamDto, Long id);
 }

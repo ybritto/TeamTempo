@@ -303,116 +303,36 @@
                           <div class="projects-list">
                             @for (project of getTeamProjects(team.uuid); track project.uuid) {
                               <div class="project-item">
-                                @if (isEditingProject(project.uuid)) {
-                                  <div class="edit-project-form-container">
-                                    <h4>Edit Project</h4>
-                                    <form [formGroup]="editProjectForm" (ngSubmit)="onUpdateProject(team.uuid || '')" class="edit-project-form">
-                                      <div class="form-group">
-                                        <label for="edit-project-name">Project Name *</label>
-                                        <input 
-                                          type="text" 
-                                          id="edit-project-name" 
-                                          formControlName="name"
-                                          class="form-input"
-                                          [class.error]="editProjectForm.get('name')?.invalid && editProjectForm.get('name')?.touched"
-                                          placeholder="Enter project name">
-                                        @if (editProjectForm.get('name')?.invalid && editProjectForm.get('name')?.touched) {
-                                          <span class="error-message">Project name is required (max 200 characters)</span>
-                                        }
-                                      </div>
-
-                                      <div class="form-group">
-                                        <label for="edit-project-description">Description</label>
-                                        <textarea 
-                                          id="edit-project-description" 
-                                          formControlName="description"
-                                          class="form-textarea"
-                                          rows="3"
-                                          placeholder="Enter project description (optional)"></textarea>
-                                        @if (editProjectForm.get('description')?.invalid && editProjectForm.get('description')?.touched) {
-                                          <span class="error-message">Description must be less than 1000 characters</span>
-                                        }
-                                      </div>
-
-                                      <div class="form-row">
-                                        <div class="form-group">
-                                          <label for="edit-project-startDate">Start Date *</label>
-                                          <input 
-                                            type="date" 
-                                            id="edit-project-startDate" 
-                                            formControlName="startDate"
-                                            class="form-input"
-                                            [class.error]="editProjectForm.get('startDate')?.invalid && editProjectForm.get('startDate')?.touched">
-                                          @if (editProjectForm.get('startDate')?.invalid && editProjectForm.get('startDate')?.touched) {
-                                            <span class="error-message">Start date is required</span>
-                                          }
-                                        </div>
-
-                                        <div class="form-group">
-                                          <label for="edit-project-endDate">End Date</label>
-                                          <input 
-                                            type="date" 
-                                            id="edit-project-endDate" 
-                                            formControlName="endDate"
-                                            class="form-input"
-                                            placeholder="Optional">
-                                        </div>
-                                      </div>
-
-                                      @if (updateProjectError()) {
-                                        <div class="error-message-container">
-                                          <p class="error-message">{{ updateProjectError() }}</p>
-                                        </div>
-                                      }
-
-                                      <div class="form-actions">
-                                        <button 
-                                          type="button" 
-                                          (click)="cancelEditProject()"
-                                          class="cancel-button">
-                                          Cancel
-                                        </button>
-                                        <button 
-                                          type="submit" 
-                                          class="submit-button"
-                                          [disabled]="updatingProject() || editProjectForm.invalid">
-                                          {{ updatingProject() ? 'Updating...' : 'Update Project' }}
-                                        </button>
-                                      </div>
-                                    </form>
-                                  </div>
-                                } @else {
-                                  <div class="project-header">
-                                    <h4 class="project-name">{{ project.name || 'Unnamed Project' }}</h4>
-                                    @if (project.uuid) {
-                                      <span class="project-uuid">{{ project.uuid }}</span>
-                                    }
-                                  </div>
-                                  @if (project.description) {
-                                    <p class="project-description">{{ project.description }}</p>
+                                <div class="project-header">
+                                  <h4 class="project-name">{{ project.name || 'Unnamed Project' }}</h4>
+                                  @if (project.uuid) {
+                                    <span class="project-uuid">{{ project.uuid }}</span>
                                   }
-                                  <div class="project-dates">
-                                    @if (project.startDate) {
-                                      <div class="project-date-item">
-                                        <span class="project-date-label">Start:</span>
-                                        <span class="project-date-value">{{ formatDate(project.startDate) }}</span>
-                                      </div>
-                                    }
-                                    @if (project.endDate) {
-                                      <div class="project-date-item">
-                                        <span class="project-date-label">End:</span>
-                                        <span class="project-date-value">{{ formatDate(project.endDate) }}</span>
-                                      </div>
-                                    }
-                                  </div>
-                                  <div class="project-actions">
-                                    <button 
-                                      (click)="startEditProject(project, team.uuid || '')" 
-                                      class="edit-project-button">
-                                      Edit
-                                    </button>
-                                  </div>
+                                </div>
+                                @if (project.description) {
+                                  <p class="project-description">{{ project.description }}</p>
                                 }
+                                <div class="project-dates">
+                                  @if (project.startDate) {
+                                    <div class="project-date-item">
+                                      <span class="project-date-label">Start:</span>
+                                      <span class="project-date-value">{{ formatDate(project.startDate) }}</span>
+                                    </div>
+                                  }
+                                  @if (project.endDate) {
+                                    <div class="project-date-item">
+                                      <span class="project-date-label">End:</span>
+                                      <span class="project-date-value">{{ formatDate(project.endDate) }}</span>
+                                    </div>
+                                  }
+                                </div>
+                                <div class="project-actions">
+                                  <button 
+                                    (click)="startEditProject(project, team.uuid || '')" 
+                                    class="edit-project-button">
+                                    Edit
+                                  </button>
+                                </div>
                               </div>
                             }
                           </div>
@@ -450,5 +370,111 @@
       }
     }
   </main>
+
+  <!-- Project Edit Modal -->
+  @if (editingProjectUuid()) {
+    <div class="modal-overlay" (click)="cancelEditProject()">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Edit Project</h2>
+          <button class="modal-close-button" (click)="cancelEditProject()" type="button">×</button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="editProjectForm" (ngSubmit)="onUpdateProject(getCurrentTeamUuid())" class="edit-project-form">
+            <div class="form-section">
+              <h3 class="form-section-title">Basic Information</h3>
+              <div class="form-group">
+                <label for="edit-project-name">Project Name *</label>
+                <input 
+                  type="text" 
+                  id="edit-project-name" 
+                  formControlName="name"
+                  class="form-input"
+                  [class.error]="editProjectForm.get('name')?.invalid && editProjectForm.get('name')?.touched"
+                  placeholder="Enter project name">
+                @if (editProjectForm.get('name')?.invalid && editProjectForm.get('name')?.touched) {
+                  <span class="error-message">Project name is required (max 200 characters)</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="edit-project-description">Description</label>
+                <textarea 
+                  id="edit-project-description" 
+                  formControlName="description"
+                  class="form-textarea"
+                  rows="4"
+                  placeholder="Enter project description (optional)"></textarea>
+                @if (editProjectForm.get('description')?.invalid && editProjectForm.get('description')?.touched) {
+                  <span class="error-message">Description must be less than 1000 characters</span>
+                }
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="edit-project-startDate">Start Date *</label>
+                  <input 
+                    type="date" 
+                    id="edit-project-startDate" 
+                    formControlName="startDate"
+                    class="form-input"
+                    [class.error]="editProjectForm.get('startDate')?.invalid && editProjectForm.get('startDate')?.touched">
+                  @if (editProjectForm.get('startDate')?.invalid && editProjectForm.get('startDate')?.touched) {
+                    <span class="error-message">Start date is required</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="edit-project-endDate">End Date</label>
+                  <input 
+                    type="date" 
+                    id="edit-project-endDate" 
+                    formControlName="endDate"
+                    class="form-input"
+                    placeholder="Optional">
+                </div>
+              </div>
+            </div>
+
+            <!-- Placeholder for future configuration sections -->
+            <!-- 
+            <div class="form-section">
+              <h3 class="form-section-title">Project Configuration</h3>
+              <div class="form-group">
+                <label for="sprint-duration">Sprint Duration (days)</label>
+                <input 
+                  type="number" 
+                  id="sprint-duration" 
+                  class="form-input"
+                  placeholder="e.g., 14">
+              </div>
+            </div>
+            -->
+
+            @if (updateProjectError()) {
+              <div class="error-message-container">
+                <p class="error-message">{{ updateProjectError() }}</p>
+              </div>
+            }
+
+            <div class="modal-actions">
+              <button 
+                type="button" 
+                (click)="cancelEditProject()"
+                class="cancel-button">
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                class="submit-button"
+                [disabled]="updatingProject() || editProjectForm.invalid">
+                {{ updatingProject() ? 'Updating...' : 'Update Project' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
 </div>
 

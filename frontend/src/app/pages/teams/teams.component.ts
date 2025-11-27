@@ -43,6 +43,7 @@ export class TeamsComponent {
   loadingProjects = signal<Set<string>>(new Set());
   projectsError = signal<Map<string, string>>(new Map());
   editingProjectUuid = signal<string | null>(null);
+  editingProjectTeamUuid = signal<string | null>(null);
   updatingProject = signal<boolean>(false);
   updateProjectError = signal<string | null>(null);
   editProjectForm: FormGroup;
@@ -433,6 +434,7 @@ export class TeamsComponent {
     if (!project.uuid) return;
     
     this.editingProjectUuid.set(project.uuid);
+    this.editingProjectTeamUuid.set(teamUuid);
     this.updateProjectError.set(null);
 
     // Format dates for input fields (YYYY-MM-DD)
@@ -455,8 +457,13 @@ export class TeamsComponent {
 
   cancelEditProject(): void {
     this.editingProjectUuid.set(null);
+    this.editingProjectTeamUuid.set(null);
     this.editProjectForm.reset();
     this.updateProjectError.set(null);
+  }
+
+  getCurrentTeamUuid(): string {
+    return this.editingProjectTeamUuid() || '';
   }
 
   onUpdateProject(teamUuid: string): void {
@@ -498,9 +505,10 @@ export class TeamsComponent {
             return newMap;
           });
           
-          // Reset form and hide it
+          // Reset form and close modal
           this.editProjectForm.reset();
           this.editingProjectUuid.set(null);
+          this.editingProjectTeamUuid.set(null);
           this.updatingProject.set(false);
         },
         error: (err) => {
@@ -518,9 +526,5 @@ export class TeamsComponent {
     }
   }
 
-  isEditingProject(projectUuid: string | undefined): boolean {
-    if (!projectUuid) return false;
-    return this.editingProjectUuid() === projectUuid;
-  }
 }
 

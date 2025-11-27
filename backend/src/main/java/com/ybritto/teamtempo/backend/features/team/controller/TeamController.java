@@ -1,6 +1,6 @@
 package com.ybritto.teamtempo.backend.features.team.controller;
 
-import com.ybritto.teamtempo.backend.features.project.ProjectService;
+import com.ybritto.teamtempo.backend.features.project.service.ProjectService;
 import com.ybritto.teamtempo.backend.features.team.service.TeamService;
 import com.ybritto.teamtempo.backend.gen.api.TeamsApi;
 import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
@@ -67,7 +67,7 @@ public class TeamController implements TeamsApi {
     @Override
     public ResponseEntity<List<ProjectDto>> getTeamProjects(String uuid) {
         logger.info("GET /teams/{}/projects - Projects for the team",  uuid);
-        List<ProjectDto> dtoList = projectService.getProejctsByTeamUuid(uuid);
+        List<ProjectDto> dtoList = projectService.getProjectsByTeamUuid(uuid);
         logger.info("GET /teams/{}/projects - {} Projects found",  uuid, dtoList.size());
         return ResponseEntity.ok(dtoList);
     }

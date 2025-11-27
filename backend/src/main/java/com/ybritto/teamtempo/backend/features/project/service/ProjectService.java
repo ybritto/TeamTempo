@@ -1,0 +1,63 @@
+package com.ybritto.teamtempo.backend.features.project.service;
+
+import com.ybritto.teamtempo.backend.core.exception.BadRequestException;
+import com.ybritto.teamtempo.backend.core.exception.NotFoundException;
+import com.ybritto.teamtempo.backend.core.utils.UUIDValidator;
+import com.ybritto.teamtempo.backend.features.project.entity.ProjectEntity;
+import com.ybritto.teamtempo.backend.features.project.mapper.ProjectMapper;
+import com.ybritto.teamtempo.backend.features.project.repository.ProjectRepository;
+import com.ybritto.teamtempo.backend.features.team.entity.TeamEntity;
+import com.ybritto.teamtempo.backend.features.team.repository.TeamRepository;
+import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@AllArgsConstructor
+public class ProjectService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
+
+    private final ProjectRepository projectRepository;
+    private final ProjectMapper projectMapper;
+    private final TeamRepository teamRepository;
+
+    public List<ProjectDto> getProjectsByTeamUuid(String teamUuidAsString) {
+        UUID teamUuid = UUIDValidator.validateAndTransform(teamUuidAsString);
+        TeamEntity team = teamRepository.findByUuid(teamUuid)
+                .orElseThrow(() -> new NotFoundException(String.format("Team with uuid %s not found", teamUuidAsString)));
+        return projectMapper.mapToDtoListWithoutTeam(projectRepository.findAllByTeam(team));
+    }
+
+    public ProjectDto updateProject(String projectUuid, ProjectDto projectDto) {
+        logger.debug("Entering method: updateProject with uuid: {}, projectName: {}", projectUuid, projectDto.getName());
+
+        UUID uuid = UUIDValidator.validateAndTransform(projectUuid);
+        ProjectEntity projectEntity = projectRepository.findByUuid(uuid).orElseThrow(() -> {
+            logger.warn("Pro not found for update with uuid: {}", projectUuid);
+            return new NotFoundException("Team not found with uuid: " + projectUuid);
+        });
+
+        if (projectDto.getUuid() == null || !projectDto.getUuid().equals(uuid.toString())) {
+            logger.warn("Project UUID mismatch: provided={}, team.uuid={}", projectUuid, projectDto.getUuid());
+            throw new BadRequestException("Project uuid does not match the provided uuid");
+        }
+
+        ProjectEntity entityToUpdate = projectMapper.mapToEntity(projectDto,projectEntity.getId())
+                .toBuilder()
+                .team(projectEntity.getTeam())
+                .build();
+        ProjectDto result = projectMapper.mapToDtoWithoutTeam(projectRepository.save(entityToUpdate));
+
+        logger.info("Successfully updated team: {} with UUID: {}", result.getName(), result.getUuid());
+        logger.debug("Exiting method: updateTeam with result: team: {}", result.getName());
+
+        return result;
+    }
+
+}

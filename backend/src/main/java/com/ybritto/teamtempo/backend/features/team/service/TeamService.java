@@ -75,7 +75,10 @@ public class TeamService {
             throw new BadRequestException("Team uuid does not match the provided uuid");
         }
 
-        TeamEntity entityToUpdate = teamMapper.mapToEntity(teamDto, teamEntity.get().getId()).toBuilder().user(getAuthenticatedUser()).build();
+        TeamEntity entityToUpdate = teamMapper.mapToEntity(teamDto, teamEntity.get().getId())
+                .toBuilder()
+                .user(getAuthenticatedUser())
+                .build();
         TeamDto result = teamMapper.mapToDto(teamRepository.save(entityToUpdate));
 
         logger.info("Successfully updated team: {} with UUID: {}", result.getName(), result.getUuid());
