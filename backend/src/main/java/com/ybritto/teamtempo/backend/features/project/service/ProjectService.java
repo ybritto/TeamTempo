@@ -1,5 +1,6 @@
 package com.ybritto.teamtempo.backend.features.project.service;
 
+import com.ybritto.teamtempo.backend.authentication.entity.UserEntity;
 import com.ybritto.teamtempo.backend.core.exception.BadRequestException;
 import com.ybritto.teamtempo.backend.core.exception.NotFoundException;
 import com.ybritto.teamtempo.backend.core.utils.UUIDValidator;
@@ -12,6 +13,8 @@ import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,6 +61,18 @@ public class ProjectService {
         logger.debug("Exiting method: updateTeam with result: team: {}", result.getName());
 
         return result;
+    }
+
+    public void deleteProject(String projectUuid) {
+        logger.debug("Entering method: deleteProject with uuid: {}", projectUuid);
+        UUID uuid = UUIDValidator.validateAndTransform(projectUuid);
+        ProjectEntity projectToDelete = projectRepository.findByUuid(uuid)
+                .orElseThrow(() -> new NotFoundException("Project not found with uuid: " + projectUuid));
+
+        projectRepository.delete(projectToDelete);
+
+        logger.info("Successfully deleted project: {} with UUID: {}", projectToDelete.getName(), projectUuid);
+        logger.debug("Exiting method: deleteProject with result: team: {}", projectToDelete.getName());
     }
 
 }

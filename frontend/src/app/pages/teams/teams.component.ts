@@ -46,6 +46,8 @@ export class TeamsComponent {
   editingProjectTeamUuid = signal<string | null>(null);
   updatingProject = signal<boolean>(false);
   updateProjectError = signal<string | null>(null);
+  deletingProjectUuid = signal<string | null>(null);
+  deleteProjectError = signal<string | null>(null);
   editProjectForm: FormGroup;
 
   createTeamForm: FormGroup;
@@ -464,6 +466,63 @@ export class TeamsComponent {
 
   getCurrentTeamUuid(): string {
     return this.editingProjectTeamUuid() || '';
+  }
+
+  deleteProject(project: ProjectDto, teamUuid: string): void {
+    if (!project.uuid) {
+      console.error('Cannot delete project: UUID is missing');
+      return;
+    }
+
+    // Clear any previous errors
+    this.deleteProjectError.set(null);
+
+    const projectName = project.name || 'this project';
+    const confirmed = confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingProjectUuid.set(project.uuid);
+
+    this.projectsService.deleteProject(project.uuid).subscribe({
+      next: () => {
+        // Remove the project from the cached projects list
+        this.teamProjects.update(projectsMap => {
+          const newMap = new Map(projectsMap);
+          const projects = newMap.get(teamUuid) || [];
+          const updatedProjects = projects.filter(p => p.uuid !== project.uuid);
+          newMap.set(teamUuid, updatedProjects);
+          return newMap;
+        });
+        
+        this.deletingProjectUuid.set(null);
+        this.deleteProjectError.set(null);
+      },
+      error: (err) => {
+        console.error('Error deleting project:', err);
+        this.deleteProjectError.set(
+          err?.error?.detail ||
+          err?.error?.message ||
+          'Failed to delete project. Please try again.'
+        );
+        this.deletingProjectUuid.set(null);
+      }
+    });
+  }
+
+  isDeletingProject(projectUuid: string | undefined): boolean {
+    if (!projectUuid) return false;
+    return this.deletingProjectUuid() === projectUuid;
+  }
+
+  getDeleteProjectError(projectUuid: string | undefined): string | null {
+    if (!projectUuid) return null;
+    if (this.deletingProjectUuid() === projectUuid) {
+      return this.deleteProjectError();
+    }
+    return null;
   }
 
   onUpdateProject(teamUuid: string): void {

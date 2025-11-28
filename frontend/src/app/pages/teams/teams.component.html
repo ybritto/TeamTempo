@@ -329,10 +329,22 @@
                                 <div class="project-actions">
                                   <button 
                                     (click)="startEditProject(project, team.uuid || '')" 
-                                    class="edit-project-button">
+                                    class="edit-project-button"
+                                    [disabled]="isDeletingProject(project.uuid)">
                                     Edit
                                   </button>
+                                  <button 
+                                    (click)="deleteProject(project, team.uuid || '')" 
+                                    class="delete-project-button"
+                                    [disabled]="isDeletingProject(project.uuid)">
+                                    {{ isDeletingProject(project.uuid) ? 'Deleting...' : 'Delete' }}
+                                  </button>
                                 </div>
+                                @if (getDeleteProjectError(project.uuid)) {
+                                  <div class="error-message-container" style="margin-top: 1rem;">
+                                    <p class="error-message">{{ getDeleteProjectError(project.uuid) }}</p>
+                                  </div>
+                                }
                               </div>
                             }
                           </div>

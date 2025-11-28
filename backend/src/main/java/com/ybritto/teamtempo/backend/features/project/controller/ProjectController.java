@@ -24,4 +24,12 @@ public class ProjectController implements ProjectsApi {
                 projectUuid, updatedProject.getName(), updatedProject.getUuid());
         return ResponseEntity.ok(updatedProject);
     }
+
+    @Override
+    public ResponseEntity<Void> deleteProject(String uuid) {
+        logger.info("DELETE /projects/{} - Deleting project", uuid);
+        projectService.deleteProject(uuid);
+        logger.info("DELETE /teams/{} - Successfully deleted project", uuid);
+        return ResponseEntity.noContent().build();
+    }
 }
