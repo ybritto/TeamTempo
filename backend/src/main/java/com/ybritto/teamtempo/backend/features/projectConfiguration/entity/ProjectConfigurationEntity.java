@@ -1,32 +1,28 @@
-package com.ybritto.teamtempo.backend.features.project.entity;
+package com.ybritto.teamtempo.backend.features.projectConfiguration.entity;
 
-import com.ybritto.teamtempo.backend.features.projectConfiguration.entity.ProjectConfigurationEntity;
-import com.ybritto.teamtempo.backend.features.team.entity.TeamEntity;
+import com.ybritto.teamtempo.backend.features.project.entity.ProjectEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Builder(toBuilder = true) // toBuilder is true to facilitate object copy/transformation to perform IT tests
@@ -36,55 +32,53 @@ import java.util.UUID;
 @EqualsAndHashCode(of = {"uuid"})
 @Entity
 @Table(
-        name = "project",
+        name = "project_configuration",
         uniqueConstraints = {
-                @UniqueConstraint(name = "proejct_uuid_unique", columnNames = {"uuid"})
+                @UniqueConstraint(name = "project_configuration_uuid_unique", columnNames = {"uuid"})
         })
-public class ProjectEntity {
+public class ProjectConfigurationEntity {
 
     @Id
     @Column(name = "key_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "projectSeqGen")
-    @SequenceGenerator(name = "projectSeqGen", sequenceName = "project_key_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "projectConfigurationSeqGen")
+    @SequenceGenerator(name = "projectConfigurationSeqGen", sequenceName = "project_configuration_key_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "uuid", unique = true, nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(name = "name",  length = 200, nullable = false)
-    @NotNull(message = "Name can not be null")
-    @NotEmpty(message = "Name can not be empty")
-    @Size(min = 1, max = 200)
-    private String name;
+    @Column(name = "iteration_duration", nullable = false)
+    private Integer iterationDuration;
 
-    @Column(name = "description", length = 1000)
-    @Size(max = 1000)
-    private String description;
+    @Column(name = "iteration_duration_unit", nullable = false, length = 20)
+    @NotNull(message = "Iteration Duration can not be null")
+    @Enumerated(EnumType.STRING)
+    private DurationUnitEnum iterationDurationUnit;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "team_id", nullable = false)
-    @NotNull(message = "Team can not be null")
-    private TeamEntity team;
+    @Column(name = "capacity_unit", nullable = false, length = 20)
+    @NotNull(message = "Capacity Unit can not be null")
+    @Enumerated(EnumType.STRING)
+    private CapacityUnitEnum capacityUnit;
 
-    @Column(name = "start_date", nullable = false)
-    @NotNull(message = "Start date can not be null")
-    private LocalDate startDate;
-
-    @Column(name = "end_date")
-    private LocalDate endDate;
+    @Column(name = "forcast_unit", nullable = false, length = 20)
+    @NotNull(message = "Forecast Unit can not be null")
+    @Enumerated(EnumType.STRING)
+    private ForecastUnitEnum forecastUnit;
 
     @Column(name = "is_active", nullable = false)
-    private boolean active = true;
+    private boolean active = false;
 
-    // TODO - Assess a way of returning only the last (only one) active configuration
-    @OneToMany(mappedBy = "project")
-    private List<ProjectConfigurationEntity> projectConfigurations;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "project_id", nullable = false)
+    @NotNull(message = "Project can not be null")
+    private ProjectEntity project;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
 
     @PrePersist
     private void prePersist() {

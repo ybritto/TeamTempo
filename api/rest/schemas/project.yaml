@@ -16,3 +16,5 @@ ProjectDto:
     endDate:
       type: string
       format: date
+    active:
+      type: boolean
