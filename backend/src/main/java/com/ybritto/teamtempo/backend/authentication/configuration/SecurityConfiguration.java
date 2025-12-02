@@ -47,7 +47,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "auth/signup", "swagger-ui/**", "v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/login", "/auth/signup", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // KEEP ADMIN ENDPOINTS AT THE BEGINNING. ORDERING MATTERS FOR SPRING SECURITY
                         // I.E: If /teams/sync is moved after /teams/**, the first will take precedence
