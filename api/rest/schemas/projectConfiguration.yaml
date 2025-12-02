@@ -1,0 +1,40 @@
+ProjectConfigurationDto:
+  description: Representation of the project configuration in the system
+  type: object
+  properties:
+    uuid:
+      type: string
+    iterationDuration:
+      type: integer
+    iterationDurationUnit:
+      $ref: '#/DurationUnitEnumDto'
+    capacityUnit:
+      $ref: '#/CapacityUnitEnumDto'
+    forecastUnit:
+      $ref: '#/ForecastUnitEnumDto'
+    active:
+      type: boolean
+    project:
+      $ref: './project.yaml#/ProjectDto'
+
+DurationUnitEnumDto:
+  description: Enumeration for iteration duration units
+  type: string
+  enum:
+    - DAYS
+    - WEEKS
+    - MONTHS
+
+CapacityUnitEnumDto:
+  description: Enumeration for capacity units
+  type: string
+  enum:
+    - STORY_POINTS
+    - T_SHIRT
+
+ForecastUnitEnumDto:
+  description: Enumeration for forecast units
+  type: string
+  enum:
+    - MAN_DAYS
+
