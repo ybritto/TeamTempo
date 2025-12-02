@@ -14,8 +14,6 @@ ProjectConfigurationDto:
       $ref: '#/ForecastUnitEnumDto'
     active:
       type: boolean
-    project:
-      $ref: './project.yaml#/ProjectDto'
 
 DurationUnitEnumDto:
   description: Enumeration for iteration duration units

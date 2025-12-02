@@ -71,4 +71,12 @@ public class TeamController implements TeamsApi {
         logger.info("GET /teams/{}/projects - {} Projects found",  uuid, dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
+
+    @Override
+    public ResponseEntity<ProjectDto> createProjectForTeam(String uuid, ProjectDto projectDto) {
+        logger.info("GET /teams/{}/projects - Create projects {} for the team {}",  uuid,  projectDto.getName(), uuid);
+        ProjectDto createdDto = projectService.createProjectForTeam(uuid, projectDto);
+        logger.info("GET /teams/{}/projects - Project {} created for the team {}",  uuid,  createdDto.getName(), uuid);
+        return ResponseEntity.ok(createdDto);
+    }
 }

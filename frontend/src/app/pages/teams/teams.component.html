@@ -282,6 +282,14 @@
                     
                     @if (isProjectsExpanded(team.uuid)) {
                       <div class="projects-content">
+                        <div class="projects-header-actions">
+                          <button 
+                            (click)="startCreateProject(team.uuid || '')" 
+                            class="create-project-button"
+                            [disabled]="isLoadingProjects(team.uuid)">
+                            + Create Project
+                          </button>
+                        </div>
                         @if (isLoadingProjects(team.uuid)) {
                           <div class="projects-loading">
                             <p>Loading projects...</p>
@@ -298,6 +306,11 @@
                         } @else if (getTeamProjects(team.uuid).length === 0) {
                           <div class="projects-empty">
                             <p>No projects found for this team.</p>
+                            <button 
+                              (click)="startCreateProject(team.uuid || '')" 
+                              class="create-project-button">
+                              Create Your First Project
+                            </button>
                           </div>
                         } @else {
                           <div class="projects-list">
@@ -383,6 +396,174 @@
     }
   </main>
 
+  <!-- Project Create Modal -->
+  @if (creatingProjectTeamUuid()) {
+    <div class="modal-overlay" (click)="cancelCreateProject()">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Create New Project</h2>
+          <button class="modal-close-button" (click)="cancelCreateProject()" type="button">×</button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="createProjectForm" (ngSubmit)="onCreateProject()" class="edit-project-form">
+            <div class="form-section">
+              <h3 class="form-section-title">Basic Information</h3>
+              <div class="form-group">
+                <label for="create-project-name">Project Name *</label>
+                <input 
+                  type="text" 
+                  id="create-project-name" 
+                  formControlName="name"
+                  class="form-input"
+                  [class.error]="createProjectForm.get('name')?.invalid && createProjectForm.get('name')?.touched"
+                  placeholder="Enter project name">
+                @if (createProjectForm.get('name')?.invalid && createProjectForm.get('name')?.touched) {
+                  <span class="error-message">Project name is required (max 200 characters)</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="create-project-description">Description</label>
+                <textarea 
+                  id="create-project-description" 
+                  formControlName="description"
+                  class="form-textarea"
+                  rows="4"
+                  placeholder="Enter project description (optional)"></textarea>
+                @if (createProjectForm.get('description')?.invalid && createProjectForm.get('description')?.touched) {
+                  <span class="error-message">Description must be less than 1000 characters</span>
+                }
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="create-project-startDate">Start Date *</label>
+                  <input 
+                    type="date" 
+                    id="create-project-startDate" 
+                    formControlName="startDate"
+                    class="form-input"
+                    [class.error]="createProjectForm.get('startDate')?.invalid && createProjectForm.get('startDate')?.touched">
+                  @if (createProjectForm.get('startDate')?.invalid && createProjectForm.get('startDate')?.touched) {
+                    <span class="error-message">Start date is required</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="create-project-endDate">End Date</label>
+                  <input 
+                    type="date" 
+                    id="create-project-endDate" 
+                    formControlName="endDate"
+                    class="form-input"
+                    placeholder="Optional">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    formControlName="active"
+                    class="checkbox-input">
+                  <span>Active Project</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="form-section-title">Project Configuration</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="create-iteration-duration">Iteration Duration *</label>
+                  <input 
+                    type="number" 
+                    id="create-iteration-duration" 
+                    formControlName="iterationDuration"
+                    class="form-input"
+                    [class.error]="createProjectForm.get('iterationDuration')?.invalid && createProjectForm.get('iterationDuration')?.touched"
+                    min="1"
+                    placeholder="e.g., 14">
+                  @if (createProjectForm.get('iterationDuration')?.invalid && createProjectForm.get('iterationDuration')?.touched) {
+                    <span class="error-message">Iteration duration is required (minimum 1)</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="create-iteration-duration-unit">Iteration Duration Unit *</label>
+                  <select 
+                    id="create-iteration-duration-unit"
+                    formControlName="iterationDurationUnit"
+                    class="form-input"
+                    [class.error]="createProjectForm.get('iterationDurationUnit')?.invalid && createProjectForm.get('iterationDurationUnit')?.touched">
+                    <option value="DAYS">Days</option>
+                    <option value="WEEKS">Weeks</option>
+                    <option value="MONTHS">Months</option>
+                  </select>
+                  @if (createProjectForm.get('iterationDurationUnit')?.invalid && createProjectForm.get('iterationDurationUnit')?.touched) {
+                    <span class="error-message">Iteration duration unit is required</span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="create-capacity-unit">Capacity Unit *</label>
+                  <select 
+                    id="create-capacity-unit"
+                    formControlName="capacityUnit"
+                    class="form-input"
+                    [class.error]="createProjectForm.get('capacityUnit')?.invalid && createProjectForm.get('capacityUnit')?.touched">
+                    <option value="STORY_POINTS">Story Points</option>
+                    <option value="T_SHIRT">T-Shirt Sizes</option>
+                  </select>
+                  @if (createProjectForm.get('capacityUnit')?.invalid && createProjectForm.get('capacityUnit')?.touched) {
+                    <span class="error-message">Capacity unit is required</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="create-forecast-unit">Forecast Unit *</label>
+                  <select 
+                    id="create-forecast-unit"
+                    formControlName="forecastUnit"
+                    class="form-input"
+                    [class.error]="createProjectForm.get('forecastUnit')?.invalid && createProjectForm.get('forecastUnit')?.touched">
+                    <option value="MAN_DAYS">Man-Days</option>
+                  </select>
+                  @if (createProjectForm.get('forecastUnit')?.invalid && createProjectForm.get('forecastUnit')?.touched) {
+                    <span class="error-message">Forecast unit is required</span>
+                  }
+                </div>
+              </div>
+            </div>
+
+            @if (createProjectError()) {
+              <div class="error-message-container">
+                <p class="error-message">{{ createProjectError() }}</p>
+              </div>
+            }
+
+            <div class="modal-actions">
+              <button 
+                type="button" 
+                (click)="cancelCreateProject()"
+                class="cancel-button">
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                class="submit-button"
+                [disabled]="creatingProject() || createProjectForm.invalid">
+                {{ creatingProject() ? 'Creating...' : 'Create Project' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Project Edit Modal -->
   @if (editingProjectUuid()) {
     <div class="modal-overlay" (click)="cancelEditProject()">
@@ -446,22 +627,84 @@
                     placeholder="Optional">
                 </div>
               </div>
-            </div>
 
-            <!-- Placeholder for future configuration sections -->
-            <!-- 
-            <div class="form-section">
-              <h3 class="form-section-title">Project Configuration</h3>
               <div class="form-group">
-                <label for="sprint-duration">Sprint Duration (days)</label>
-                <input 
-                  type="number" 
-                  id="sprint-duration" 
-                  class="form-input"
-                  placeholder="e.g., 14">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    formControlName="active"
+                    class="checkbox-input">
+                  <span>Active Project</span>
+                </label>
               </div>
             </div>
-            -->
+
+            <div class="form-section">
+              <h3 class="form-section-title">Project Configuration</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="iteration-duration">Iteration Duration *</label>
+                  <input 
+                    type="number" 
+                    id="iteration-duration" 
+                    formControlName="iterationDuration"
+                    class="form-input"
+                    [class.error]="editProjectForm.get('iterationDuration')?.invalid && editProjectForm.get('iterationDuration')?.touched"
+                    min="1"
+                    placeholder="e.g., 14">
+                  @if (editProjectForm.get('iterationDuration')?.invalid && editProjectForm.get('iterationDuration')?.touched) {
+                    <span class="error-message">Iteration duration is required (minimum 1)</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="iteration-duration-unit">Iteration Duration Unit *</label>
+                  <select 
+                    id="iteration-duration-unit"
+                    formControlName="iterationDurationUnit"
+                    class="form-input"
+                    [class.error]="editProjectForm.get('iterationDurationUnit')?.invalid && editProjectForm.get('iterationDurationUnit')?.touched">
+                    <option value="DAYS">Days</option>
+                    <option value="WEEKS">Weeks</option>
+                    <option value="MONTHS">Months</option>
+                  </select>
+                  @if (editProjectForm.get('iterationDurationUnit')?.invalid && editProjectForm.get('iterationDurationUnit')?.touched) {
+                    <span class="error-message">Iteration duration unit is required</span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="capacity-unit">Capacity Unit *</label>
+                  <select 
+                    id="capacity-unit"
+                    formControlName="capacityUnit"
+                    class="form-input"
+                    [class.error]="editProjectForm.get('capacityUnit')?.invalid && editProjectForm.get('capacityUnit')?.touched">
+                    <option value="STORY_POINTS">Story Points</option>
+                    <option value="T_SHIRT">T-Shirt Sizes</option>
+                  </select>
+                  @if (editProjectForm.get('capacityUnit')?.invalid && editProjectForm.get('capacityUnit')?.touched) {
+                    <span class="error-message">Capacity unit is required</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label for="forecast-unit">Forecast Unit *</label>
+                  <select 
+                    id="forecast-unit"
+                    formControlName="forecastUnit"
+                    class="form-input"
+                    [class.error]="editProjectForm.get('forecastUnit')?.invalid && editProjectForm.get('forecastUnit')?.touched">
+                    <option value="MAN_DAYS">Man-Days</option>
+                  </select>
+                  @if (editProjectForm.get('forecastUnit')?.invalid && editProjectForm.get('forecastUnit')?.touched) {
+                    <span class="error-message">Forecast unit is required</span>
+                  }
+                </div>
+              </div>
+            </div>
 
             @if (updateProjectError()) {
               <div class="error-message-container">

@@ -32,4 +32,6 @@ public class ProjectController implements ProjectsApi {
         logger.info("DELETE /teams/{} - Successfully deleted project", uuid);
         return ResponseEntity.noContent().build();
     }
+
+
 }

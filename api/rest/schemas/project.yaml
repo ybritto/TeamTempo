@@ -18,7 +18,5 @@ ProjectDto:
       format: date
     active:
       type: boolean
-    projectConfigurations:
-      type: array
-      items:
-        $ref: './projectConfiguration.yaml#/ProjectConfigurationDto'
+    projectConfiguration:
+      $ref: './projectConfiguration.yaml#/ProjectConfigurationDto'

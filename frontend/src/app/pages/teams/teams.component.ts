@@ -4,6 +4,20 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {HeaderComponent} from '../../shared/header/header.component';
 import {TeamService, TeamsService, ProjectsService, TeamDto, ProjectDto} from '../../../api';
 
+// Project Configuration types (until generated models are updated)
+type DurationUnit = 'DAYS' | 'WEEKS' | 'MONTHS';
+type CapacityUnit = 'STORY_POINTS' | 'T_SHIRT';
+type ForecastUnit = 'MAN_DAYS';
+
+interface ProjectConfigurationDto {
+  uuid?: string;
+  iterationDuration?: number;
+  iterationDurationUnit?: DurationUnit;
+  capacityUnit?: CapacityUnit;
+  forecastUnit?: ForecastUnit;
+  active?: boolean;
+}
+
 @Component({
   selector: 'app-teams',
   imports: [CommonModule, ReactiveFormsModule, HeaderComponent],
@@ -36,7 +50,7 @@ export class TeamsComponent {
   selectedTeamUuids = signal<Set<string>>(new Set());
   bulkDeleting = signal<boolean>(false);
   bulkDeleteError = signal<string | null>(null);
-  
+
   // Projects management
   expandedTeamUuid = signal<string | null>(null);
   teamProjects = signal<Map<string, ProjectDto[]>>(new Map());
@@ -48,7 +62,11 @@ export class TeamsComponent {
   updateProjectError = signal<string | null>(null);
   deletingProjectUuid = signal<string | null>(null);
   deleteProjectError = signal<string | null>(null);
+  creatingProjectTeamUuid = signal<string | null>(null);
+  creatingProject = signal<boolean>(false);
+  createProjectError = signal<string | null>(null);
   editProjectForm: FormGroup;
+  createProjectForm: FormGroup;
 
   createTeamForm: FormGroup;
   editTeamForm: FormGroup;
@@ -70,7 +88,25 @@ export class TeamsComponent {
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
       description: ['', [Validators.maxLength(1000)]],
       startDate: ['', [Validators.required]],
-      endDate: ['']
+      endDate: [''],
+      active: [true],
+      // Configuration fields
+      iterationDuration: [14, [Validators.required, Validators.min(1)]],
+      iterationDurationUnit: ['DAYS' as DurationUnit, [Validators.required]],
+      capacityUnit: ['STORY_POINTS' as CapacityUnit, [Validators.required]],
+      forecastUnit: ['MAN_DAYS' as ForecastUnit, [Validators.required]]
+    });
+    this.createProjectForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
+      description: ['', [Validators.maxLength(1000)]],
+      startDate: ['', [Validators.required]],
+      endDate: [''],
+      active: [true],
+      // Configuration fields
+      iterationDuration: [14, [Validators.required, Validators.min(1)]],
+      iterationDurationUnit: ['DAYS' as DurationUnit, [Validators.required]],
+      capacityUnit: ['STORY_POINTS' as CapacityUnit, [Validators.required]],
+      forecastUnit: ['MAN_DAYS' as ForecastUnit, [Validators.required]]
     });
     this.loadTeams();
   }
@@ -350,7 +386,7 @@ export class TeamsComponent {
     if (!team.uuid) return;
 
     const currentExpanded = this.expandedTeamUuid();
-    
+
     // If clicking the same team, collapse it
     if (currentExpanded === team.uuid) {
       this.expandedTeamUuid.set(null);
@@ -434,7 +470,7 @@ export class TeamsComponent {
 
   startEditProject(project: ProjectDto, teamUuid: string): void {
     if (!project.uuid) return;
-    
+
     this.editingProjectUuid.set(project.uuid);
     this.editingProjectTeamUuid.set(teamUuid);
     this.updateProjectError.set(null);
@@ -449,11 +485,20 @@ export class TeamsComponent {
       return `${year}-${month}-${day}`;
     };
 
+    // Extract configuration (using 'any' for now since generated types may not be updated)
+    const config = (project as any).projectConfiguration || {};
+
     this.editProjectForm.patchValue({
       name: project.name || '',
       description: project.description || '',
       startDate: formatDateForInput(project.startDate),
-      endDate: formatDateForInput(project.endDate)
+      endDate: formatDateForInput(project.endDate),
+      active: (project as any).active ?? true,
+      // Configuration values
+      iterationDuration: config.iterationDuration || 14,
+      iterationDurationUnit: config.iterationDurationUnit || 'DAYS',
+      capacityUnit: config.capacityUnit || 'STORY_POINTS',
+      forecastUnit: config.forecastUnit || 'MAN_DAYS'
     });
   }
 
@@ -496,7 +541,7 @@ export class TeamsComponent {
           newMap.set(teamUuid, updatedProjects);
           return newMap;
         });
-        
+
         this.deletingProjectUuid.set(null);
         this.deleteProjectError.set(null);
       },
@@ -531,24 +576,36 @@ export class TeamsComponent {
       this.updateProjectError.set(null);
 
       const projectUuid = this.editingProjectUuid()!;
-      
+
       // Get the current project to preserve team reference
       const currentProjects = this.teamProjects().get(teamUuid) || [];
       const currentProject = currentProjects.find(p => p.uuid === projectUuid);
-      
+
       if (!currentProject) {
         this.updateProjectError.set('Project not found');
         this.updatingProject.set(false);
         return;
       }
 
-      const projectData: ProjectDto = {
+      // Build configuration object
+      const projectConfiguration: ProjectConfigurationDto = {
+        uuid: (currentProject as any).projectConfiguration?.uuid,
+        iterationDuration: this.editProjectForm.value.iterationDuration,
+        iterationDurationUnit: this.editProjectForm.value.iterationDurationUnit,
+        capacityUnit: this.editProjectForm.value.capacityUnit,
+        forecastUnit: this.editProjectForm.value.forecastUnit,
+        active: this.editProjectForm.value.active ?? true
+      };
+
+      const projectData: any = {
         uuid: projectUuid,
         name: this.editProjectForm.value.name,
         description: this.editProjectForm.value.description || undefined,
         startDate: this.editProjectForm.value.startDate,
         endDate: this.editProjectForm.value.endDate || undefined,
-        team: currentProject.team // Preserve team reference
+        active: this.editProjectForm.value.active ?? true,
+        team: currentProject.team, // Preserve team reference
+        projectConfiguration: projectConfiguration
       };
 
       this.projectsService.updateProject(projectUuid, projectData).subscribe({
@@ -557,13 +614,13 @@ export class TeamsComponent {
           this.teamProjects.update(projectsMap => {
             const newMap = new Map(projectsMap);
             const projects = newMap.get(teamUuid) || [];
-            const updatedProjects = projects.map(p => 
+            const updatedProjects = projects.map(p =>
               p.uuid === projectUuid ? updatedProject : p
             );
             newMap.set(teamUuid, updatedProjects);
             return newMap;
           });
-          
+
           // Reset form and close modal
           this.editProjectForm.reset();
           this.editingProjectUuid.set(null);
@@ -585,5 +642,106 @@ export class TeamsComponent {
     }
   }
 
+  startCreateProject(teamUuid: string): void {
+    this.creatingProjectTeamUuid.set(teamUuid);
+    this.createProjectError.set(null);
+
+    // Set default start date to today
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+
+    this.createProjectForm.reset({
+      name: '',
+      description: '',
+      startDate: todayStr,
+      endDate: '',
+      active: true,
+      iterationDuration: 14,
+      iterationDurationUnit: 'DAYS',
+      capacityUnit: 'STORY_POINTS',
+      forecastUnit: 'MAN_DAYS'
+    });
+  }
+
+  cancelCreateProject(): void {
+    this.creatingProjectTeamUuid.set(null);
+    this.createProjectForm.reset();
+    this.createProjectError.set(null);
+  }
+
+  onCreateProject(): void {
+    if (this.createProjectForm.valid && this.creatingProjectTeamUuid()) {
+      this.creatingProject.set(true);
+      this.createProjectError.set(null);
+
+      const teamUuid = this.creatingProjectTeamUuid()!;
+
+      // Get the team to include in the project
+      const team = this.teams().find(t => t.uuid === teamUuid);
+      if (!team) {
+        this.createProjectError.set('Team not found');
+        this.creatingProject.set(false);
+        return;
+      }
+
+      // Build configuration object
+      const projectConfiguration: ProjectConfigurationDto = {
+        iterationDuration: this.createProjectForm.value.iterationDuration,
+        iterationDurationUnit: this.createProjectForm.value.iterationDurationUnit,
+        capacityUnit: this.createProjectForm.value.capacityUnit,
+        forecastUnit: this.createProjectForm.value.forecastUnit,
+        active: this.createProjectForm.value.active ?? true
+      };
+
+      const projectData: any = {
+        name: this.createProjectForm.value.name,
+        description: this.createProjectForm.value.description || undefined,
+        startDate: this.createProjectForm.value.startDate,
+        endDate: this.createProjectForm.value.endDate || undefined,
+        active: this.createProjectForm.value.active ?? true,
+        team: {
+          uuid: team.uuid,
+          name: team.name
+        },
+        projectConfiguration: projectConfiguration
+      };
+
+      this.projectsService.createProjectForTeam(teamUuid, projectData).subscribe({
+        next: (createdProject: ProjectDto) => {
+          // Add the new project to the cached projects list
+          this.teamProjects.update(projectsMap => {
+            const newMap = new Map(projectsMap);
+            const projects = newMap.get(teamUuid) || [];
+            newMap.set(teamUuid, [...projects, createdProject]);
+            return newMap;
+          });
+
+          // Reset form and close modal
+          this.createProjectForm.reset();
+          this.creatingProjectTeamUuid.set(null);
+          this.creatingProject.set(false);
+        },
+        error: (err) => {
+          console.error('Error creating project:', err);
+          this.createProjectError.set(
+            err?.error?.detail ||
+            err?.error?.message ||
+            'Failed to create project. Please try again.'
+          );
+          this.creatingProject.set(false);
+        }
+      });
+    } else {
+      this.createProjectForm.markAllAsTouched();
+    }
+  }
+
+  isCreatingProject(teamUuid: string | undefined): boolean {
+    if (!teamUuid) return false;
+    return this.creatingProjectTeamUuid() === teamUuid;
+  }
 }
 

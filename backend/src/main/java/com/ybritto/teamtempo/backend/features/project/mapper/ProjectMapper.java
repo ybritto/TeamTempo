@@ -2,6 +2,8 @@ package com.ybritto.teamtempo.backend.features.project.mapper;
 
 import com.ybritto.teamtempo.backend.core.mapper.CommonsMapper;
 import com.ybritto.teamtempo.backend.features.project.entity.ProjectEntity;
+import com.ybritto.teamtempo.backend.features.projectConfiguration.entity.ProjectConfigurationEntity;
+import com.ybritto.teamtempo.backend.features.projectConfiguration.mapper.ProjectConfigurationMapper;
 import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring",
         nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
-        uses = {CommonsMapper.class})
+        uses = {CommonsMapper.class, ProjectConfigurationMapper.class})
 public interface ProjectMapper {
 
     default List<ProjectDto> mapToDtoListWithoutTeam(List<ProjectEntity> allByTeam) {
@@ -31,14 +33,15 @@ public interface ProjectMapper {
 
     @Named("mapToDtoWithoutTeam")
     @Mapping(target = "team", ignore = true)
+    @Mapping(target = "projectConfiguration", source = "projectConfigurations", qualifiedByName = "mapToDtoFromList")
     ProjectDto mapToDtoWithoutTeam(ProjectEntity entity);
 
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "team", ignore = true)
+    @Mapping(target = "projectConfigurations", source = "projectDto.projectConfiguration", qualifiedByName = "mapToProjectConfigurationEntity")
     ProjectEntity mapToEntity(ProjectDto projectDto, Long id);
+
 
 }

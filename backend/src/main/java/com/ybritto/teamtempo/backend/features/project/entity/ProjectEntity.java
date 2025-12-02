@@ -24,6 +24,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,8 +78,8 @@ public class ProjectEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
-    // TODO - Assess a way of returning only the last (only one) active configuration
     @OneToMany(mappedBy = "project")
+    @SQLRestriction("is_active = true")
     private List<ProjectConfigurationEntity> projectConfigurations;
 
     @Column(name = "created_at", nullable = false, updatable = false)

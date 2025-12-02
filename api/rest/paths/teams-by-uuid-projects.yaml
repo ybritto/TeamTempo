@@ -40,6 +40,51 @@ get:
             $ref: "../schemas/common.yaml#/ProblemDto"
 
 
+post:
+  tags:
+    - projects
+  summary: Create a new project for the team
+  description: Create a new project for the team by uuid
+  operationId: createProjectForTeam
+  parameters:
+    - in: path
+      name: uuid
+      schema:
+        type: string
+      required: true
+      description: "UUID of the team"
+  requestBody:
+    description: 'Project to create'
+    required: true
+    content:
+      'application/json':
+        schema:
+          $ref: '../schemas/project.yaml#/ProjectDto'
+  responses:
+    '200':
+      description: 'Project successfully updated'
+      content:
+        'application/json':
+          schema:
+            $ref: '../schemas/project.yaml#/ProjectDto'
+    '400':
+      description: 'Bad Request'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '422':
+      description: 'Unprocessable Entity'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
+    '500':
+      description: 'Internal Server Error'
+      content:
+        'application/problem+json':
+          schema:
+            $ref: "../schemas/common.yaml#/ProblemDto"
 
 
 

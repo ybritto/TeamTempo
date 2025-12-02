@@ -75,4 +75,23 @@ public class ProjectService {
         logger.debug("Exiting method: deleteProject with result: team: {}", projectToDelete.getName());
     }
 
+    public ProjectDto createProjectForTeam(String teamUuidAsString, ProjectDto projectDto) {
+        logger.debug("Entering method: createProjectForTeam with uuid: {}, projectName: {}", teamUuidAsString, projectDto.getName());
+
+        TeamEntity team = teamRepository.findByUuid(UUIDValidator.validateAndTransform(teamUuidAsString))
+                .orElseThrow(() -> new NotFoundException("Team not found with uuid: " + teamUuidAsString));
+
+        ProjectEntity projectToCreate = projectMapper.mapToEntity(projectDto, null)
+                .toBuilder()
+                .team(team)
+                .build();
+
+        ProjectDto projectDtoCreated = projectMapper
+                .mapToDtoWithoutTeam(projectRepository.save(projectToCreate));
+
+        logger.info("Successfully created project: {} with UUID: {}", projectDtoCreated.getName(), projectDtoCreated.getUuid());
+        logger.debug("Exiting method: createProjectForTeam with result: team: {}", projectDtoCreated.getName());
+
+        return projectDtoCreated;
+    }
 }

@@ -149,7 +149,8 @@
 }
 
 .form-input,
-.form-textarea {
+.form-textarea,
+select.form-input {
   padding: 0.75rem 1rem;
   font-size: 1rem;
   color: var(--text-gray);
@@ -161,6 +162,11 @@
   width: 100%;
   box-sizing: border-box;
   min-width: 0;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23263238' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
 
   &:focus {
     outline: none;
@@ -174,6 +180,14 @@
 
   &::placeholder {
     color: #9e9e9e;
+  }
+}
+
+select.form-input {
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary-teal);
   }
 }
 
@@ -431,6 +445,37 @@
 .projects-content {
   margin-top: 1rem;
   animation: slideDown 0.3s ease-out;
+}
+
+.projects-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.create-project-button {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-teal);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(77, 182, 172, 0.2);
+
+  &:hover:not(:disabled) {
+    background: #3A9A8F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(77, 182, 172, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .projects-loading,
@@ -726,6 +771,28 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  color: var(--text-gray);
+  user-select: none;
+
+  .checkbox-input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-teal);
+    margin: 0;
+  }
+
+  span {
+    font-weight: 500;
+  }
 }
 
 .team-card-actions {
