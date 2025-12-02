@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: dev
+
   application:
     name: TeamTempo App - Backend
 
@@ -26,7 +29,6 @@ spring:
     clean-disabled: false
     default-schema: public
     create-schemas: true
-
 
 app:
   db:

@@ -2,7 +2,6 @@ package com.ybritto.teamtempo.backend.features.project.mapper;
 
 import com.ybritto.teamtempo.backend.core.mapper.CommonsMapper;
 import com.ybritto.teamtempo.backend.features.project.entity.ProjectEntity;
-import com.ybritto.teamtempo.backend.features.projectConfiguration.entity.ProjectConfigurationEntity;
 import com.ybritto.teamtempo.backend.features.projectConfiguration.mapper.ProjectConfigurationMapper;
 import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
 import org.mapstruct.Mapper;

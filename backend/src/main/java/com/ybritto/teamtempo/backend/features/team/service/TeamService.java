@@ -103,11 +103,14 @@ public class TeamService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication.getPrincipal() == null) {
+            logger.error("Attempted to access authenticated user but user is not authenticated");
             throw new IllegalStateException("User is not authenticated");
         }
 
         // The principal is set to UserEntity in JwtAuthenticationFilter
-        return (UserEntity) authentication.getPrincipal();
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        logger.debug("Retrieved authenticated user: {}", user.getEmail());
+        return user;
     }
 
     public void deleteSelectedTeams(List<String> teamUuidList) {

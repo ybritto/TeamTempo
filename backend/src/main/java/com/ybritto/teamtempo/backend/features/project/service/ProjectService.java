@@ -1,6 +1,5 @@
 package com.ybritto.teamtempo.backend.features.project.service;
 
-import com.ybritto.teamtempo.backend.authentication.entity.UserEntity;
 import com.ybritto.teamtempo.backend.core.exception.BadRequestException;
 import com.ybritto.teamtempo.backend.core.exception.NotFoundException;
 import com.ybritto.teamtempo.backend.core.utils.UUIDValidator;
@@ -13,8 +12,6 @@ import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,10 +28,16 @@ public class ProjectService {
     private final TeamRepository teamRepository;
 
     public List<ProjectDto> getProjectsByTeamUuid(String teamUuidAsString) {
+        logger.debug("Retrieving projects for team UUID: {}", teamUuidAsString);
         UUID teamUuid = UUIDValidator.validateAndTransform(teamUuidAsString);
         TeamEntity team = teamRepository.findByUuid(teamUuid)
-                .orElseThrow(() -> new NotFoundException(String.format("Team with uuid %s not found", teamUuidAsString)));
-        return projectMapper.mapToDtoListWithoutTeam(projectRepository.findAllByTeam(team));
+                .orElseThrow(() -> {
+                    logger.warn("Team not found for retrieving projects with UUID: {}", teamUuidAsString);
+                    return new NotFoundException(String.format("Team with uuid %s not found", teamUuidAsString));
+                });
+        List<ProjectDto> projects = projectMapper.mapToDtoListWithoutTeam(projectRepository.findAllByTeam(team));
+        logger.info("Retrieved {} projects for team UUID: {}", projects.size(), teamUuidAsString);
+        return projects;
     }
 
     public ProjectDto updateProject(String projectUuid, ProjectDto projectDto) {
@@ -42,8 +45,8 @@ public class ProjectService {
 
         UUID uuid = UUIDValidator.validateAndTransform(projectUuid);
         ProjectEntity projectEntity = projectRepository.findByUuid(uuid).orElseThrow(() -> {
-            logger.warn("Pro not found for update with uuid: {}", projectUuid);
-            return new NotFoundException("Team not found with uuid: " + projectUuid);
+            logger.warn("Project not found for update with UUID: {}", projectUuid);
+            return new NotFoundException("Project not found with uuid: " + projectUuid);
         });
 
         if (projectDto.getUuid() == null || !projectDto.getUuid().equals(uuid.toString())) {
@@ -57,29 +60,35 @@ public class ProjectService {
                 .build();
         ProjectDto result = projectMapper.mapToDtoWithoutTeam(projectRepository.save(entityToUpdate));
 
-        logger.info("Successfully updated team: {} with UUID: {}", result.getName(), result.getUuid());
-        logger.debug("Exiting method: updateTeam with result: team: {}", result.getName());
+        logger.info("Successfully updated project: {} with UUID: {}", result.getName(), result.getUuid());
+        logger.debug("Exiting method: updateProject with result: project: {}", result.getName());
 
         return result;
     }
 
     public void deleteProject(String projectUuid) {
-        logger.debug("Entering method: deleteProject with uuid: {}", projectUuid);
+        logger.debug("Entering method: deleteProject with UUID: {}", projectUuid);
         UUID uuid = UUIDValidator.validateAndTransform(projectUuid);
         ProjectEntity projectToDelete = projectRepository.findByUuid(uuid)
-                .orElseThrow(() -> new NotFoundException("Project not found with uuid: " + projectUuid));
+                .orElseThrow(() -> {
+                    logger.warn("Project not found for deletion with UUID: {}", projectUuid);
+                    return new NotFoundException("Project not found with uuid: " + projectUuid);
+                });
 
         projectRepository.delete(projectToDelete);
 
         logger.info("Successfully deleted project: {} with UUID: {}", projectToDelete.getName(), projectUuid);
-        logger.debug("Exiting method: deleteProject with result: team: {}", projectToDelete.getName());
+        logger.debug("Exiting method: deleteProject with result: project: {}", projectToDelete.getName());
     }
 
     public ProjectDto createProjectForTeam(String teamUuidAsString, ProjectDto projectDto) {
-        logger.debug("Entering method: createProjectForTeam with uuid: {}, projectName: {}", teamUuidAsString, projectDto.getName());
+        logger.debug("Entering method: createProjectForTeam with team UUID: {}, projectName: {}", teamUuidAsString, projectDto.getName());
 
         TeamEntity team = teamRepository.findByUuid(UUIDValidator.validateAndTransform(teamUuidAsString))
-                .orElseThrow(() -> new NotFoundException("Team not found with uuid: " + teamUuidAsString));
+                .orElseThrow(() -> {
+                    logger.warn("Team not found for creating project with UUID: {}", teamUuidAsString);
+                    return new NotFoundException("Team not found with uuid: " + teamUuidAsString);
+                });
 
         ProjectEntity projectToCreate = projectMapper.mapToEntity(projectDto, null)
                 .toBuilder()
@@ -89,8 +98,9 @@ public class ProjectService {
         ProjectDto projectDtoCreated = projectMapper
                 .mapToDtoWithoutTeam(projectRepository.save(projectToCreate));
 
-        logger.info("Successfully created project: {} with UUID: {}", projectDtoCreated.getName(), projectDtoCreated.getUuid());
-        logger.debug("Exiting method: createProjectForTeam with result: team: {}", projectDtoCreated.getName());
+        logger.info("Successfully created project: {} with UUID: {} for team: {}", 
+                projectDtoCreated.getName(), projectDtoCreated.getUuid(), teamUuidAsString);
+        logger.debug("Exiting method: createProjectForTeam with result: project: {}", projectDtoCreated.getName());
 
         return projectDtoCreated;
     }

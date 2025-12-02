@@ -25,7 +25,7 @@ public class TeamController implements TeamsApi {
     public ResponseEntity<List<TeamDto>> myTeams() {
         logger.info("GET /teams/my-teams - Finding my teams");
         List<TeamDto> dtoList = teamService.getMyTeams();
-        logger.info("GET /auth/my-teams - {} teams returned", dtoList.size());
+        logger.info("GET /teams/my-teams - {} teams returned", dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
 
@@ -74,9 +74,9 @@ public class TeamController implements TeamsApi {
 
     @Override
     public ResponseEntity<ProjectDto> createProjectForTeam(String uuid, ProjectDto projectDto) {
-        logger.info("GET /teams/{}/projects - Create projects {} for the team {}",  uuid,  projectDto.getName(), uuid);
+        logger.info("POST /teams/{}/projects - Creating project {} for the team {}", uuid, projectDto.getName(), uuid);
         ProjectDto createdDto = projectService.createProjectForTeam(uuid, projectDto);
-        logger.info("GET /teams/{}/projects - Project {} created for the team {}",  uuid,  createdDto.getName(), uuid);
+        logger.info("POST /teams/{}/projects - Project {} created successfully for the team {}", uuid, createdDto.getName(), uuid);
         return ResponseEntity.ok(createdDto);
     }
 }

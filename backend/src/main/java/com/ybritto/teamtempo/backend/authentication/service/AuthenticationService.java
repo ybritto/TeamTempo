@@ -34,20 +34,31 @@ public class AuthenticationService {
     private final JwtService jwtService;
 
     private UserEntity authenticate(LoginUserDto input) {
+        logger.debug("Attempting to authenticate user with email: {}", input.getEmail());
 
         UserEntity userEntity = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s not found, please contact your admin", input.getEmail())));
+                .orElseThrow(() -> {
+                    logger.warn("Authentication failed: User not found with email: {}", input.getEmail());
+                    return new UsernameNotFoundException(String.format("User %s not found, please contact your admin", input.getEmail()));
+                });
 
         if (!userEntity.isEnabled()) {
+            logger.warn("Authentication failed: User is disabled with email: {}", input.getEmail());
             throw new DisabledException((String.format("User %s is inactive, please contact your admin", input.getEmail())));
         }
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
-                        input.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            input.getEmail(),
+                            input.getPassword()
+                    )
+            );
+            logger.debug("Password authentication successful for user: {}", input.getEmail());
+        } catch (Exception e) {
+            logger.error("Authentication failed for user: {} - {}", input.getEmail(), e.getMessage());
+            throw e;
+        }
 
         return userEntity;
     }

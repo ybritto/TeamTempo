@@ -20,7 +20,7 @@ public class ProjectController implements ProjectsApi {
     public ResponseEntity<ProjectDto> updateProject(String projectUuid, ProjectDto projectDto) {
         logger.info("PUT /projects/{} - Updating project: {}", projectUuid, projectDto.getName());
         ProjectDto updatedProject = projectService.updateProject(projectUuid, projectDto);
-        logger.info("PUT /projects/{} - Successfully updated team: {} with UUID: {}",
+        logger.info("PUT /projects/{} - Successfully updated project: {} with UUID: {}",
                 projectUuid, updatedProject.getName(), updatedProject.getUuid());
         return ResponseEntity.ok(updatedProject);
     }
@@ -29,7 +29,7 @@ public class ProjectController implements ProjectsApi {
     public ResponseEntity<Void> deleteProject(String uuid) {
         logger.info("DELETE /projects/{} - Deleting project", uuid);
         projectService.deleteProject(uuid);
-        logger.info("DELETE /teams/{} - Successfully deleted project", uuid);
+        logger.info("DELETE /projects/{} - Successfully deleted project", uuid);
         return ResponseEntity.noContent().build();
     }
 

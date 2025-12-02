@@ -35,3 +35,9 @@ build/
 /mvnw.cmd
 /.gitattributes
 /.mvn/
+
+### Logs ###
+logs/
+*.log
+*.log.*
+*.gz

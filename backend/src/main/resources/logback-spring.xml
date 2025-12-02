@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Property definitions -->
+    <!-- 
+        Log file location resolution (in order of priority):
+        1. LOG_FILE environment variable (e.g., /var/log/teamtempo/application.log)
+        2. LOG_PATH environment variable + spring.log (e.g., /var/log/teamtempo/)
+        3. LOG_TEMP environment variable + spring.log
+        4. Default: backend/logs/spring.log (relative to project root, or logs/spring.log if run from backend/)
+        
+        Note: Path is relative to the current working directory where the application is started.
+        If running from project root: backend/logs/spring.log
+        If running from backend folder: logs/spring.log
+    -->
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-backend/logs/}spring.log}}"/>
+    <property name="LOG_FILE_MAX_SIZE" value="10MB"/>
+    <property name="LOG_FILE_MAX_HISTORY" value="30"/>
+
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- File Appender -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Application-specific loggers -->
+    <logger name="com.ybritto.teamtempo" level="INFO"/>
+    
+    <!-- Security-related logging -->
+    <logger name="com.ybritto.teamtempo.backend.authentication" level="DEBUG"/>
+    <logger name="com.ybritto.teamtempo.backend.authentication.configuration.JwtAuthenticationFilter" level="DEBUG"/>
+    <logger name="com.ybritto.teamtempo.backend.authentication.service.JwtService" level="DEBUG"/>
+    
+    <!-- Controller logging -->
+    <logger name="com.ybritto.teamtempo.backend.authentication.controller" level="INFO"/>
+    <logger name="com.ybritto.teamtempo.backend.features.team.controller" level="INFO"/>
+    <logger name="com.ybritto.teamtempo.backend.features.project.controller" level="INFO"/>
+    
+    <!-- Service logging -->
+    <logger name="com.ybritto.teamtempo.backend.features.team.service" level="DEBUG"/>
+    <logger name="com.ybritto.teamtempo.backend.features.project.service" level="DEBUG"/>
+    
+    <!-- Exception handler logging -->
+    <logger name="com.ybritto.teamtempo.backend.core.exception" level="WARN"/>
+    
+    <!-- Utility logging -->
+    <logger name="com.ybritto.teamtempo.backend.core.utils" level="DEBUG"/>
+    
+    <!-- Spring Framework logging -->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.security" level="DEBUG"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    
+    <!-- Database logging -->
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+    
+    <!-- Flyway logging -->
+    <logger name="org.flywaydb" level="INFO"/>
+    
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!-- Profile-specific configurations -->
+    <springProfile name="dev,development">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod,production">
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+        </root>
+        <logger name="com.ybritto.teamtempo" level="INFO"/>
+    </springProfile>
+
+</configuration>
+
