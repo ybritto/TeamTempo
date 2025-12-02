@@ -1,0 +1,61 @@
+# Production Profile Configuration
+# This profile is used for production deployments
+# IMPORTANT: All sensitive values should be set via environment variables
+
+spring:
+  # Disable SQL logging in production for performance
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+
+  # Flyway settings for production
+  flyway:
+    clean-disabled: true  # NEVER allow clean in production
+    enabled: true
+    validate-on-migrate: true
+
+# Application database settings for production
+# These MUST be set via environment variables:
+# - APP_DB_HOST
+# - APP_DB_PORT
+# - APP_DB_NAME
+# - APP_DB_USERNAME
+# - APP_DB_PASSWORD
+app:
+  db:
+    host: ${APP_DB_HOST}  # REQUIRED - no default
+    port: ${APP_DB_PORT:5432}
+    name: ${APP_DB_NAME}  # REQUIRED - no default
+    username: ${APP_DB_USERNAME}  # REQUIRED - no default
+    password: ${APP_DB_PASSWORD}  # REQUIRED - no default
+
+# Production-specific server settings
+server:
+  error:
+    include-stacktrace: never  # Never expose stack traces in production
+    include-exception: false    # Never expose exception details in production
+    include-message: always     # Include error messages for API responses
+    whitelabel:
+      enabled: false  # Disable default error page
+
+# Logging configuration for production
+logging:
+  level:
+    root: INFO
+    com.ybritto.teamtempo: INFO
+    org.springframework: WARN
+    org.springframework.security: INFO
+    org.hibernate: WARN
+    org.hibernate.SQL: INFO  # Only log SQL in production if needed for debugging
+    org.flywaydb: INFO
+
+# Security configuration for production
+security:
+  jwt:
+    # JWT secret key MUST be provided via JWT_SECRET_KEY environment variable
+    # This is a placeholder - production MUST override this
+    secret-key: ${JWT_SECRET_KEY}  # REQUIRED - no default for security
+

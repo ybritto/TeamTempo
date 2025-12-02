@@ -1,35 +1,47 @@
 spring:
-  profiles:
-    active: dev
-
   application:
     name: TeamTempo App - Backend
 
+  # Active profile - defaults to 'dev' but can be overridden via SPRING_PROFILES_ACTIVE environment variable
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # Database configuration - values from environment variables or profile-specific configs
   datasource:
     url: jdbc:postgresql://${app.db.host}:${app.db.port}/${app.db.name}
     username: ${app.db.username}
     password: ${app.db.password}
     driver-class-name: ${POSTGRES_DRIVER:org.postgresql.Driver}
+    hikari:
+      # Connection pool settings
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME:1800000}
 
   jpa:
     database: postgresql
-    show-sql: true
     hibernate:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
-  sql:
-    init:
-      mode: always
+    properties:
+      hibernate:
+        format_sql: ${HIBERNATE_FORMAT_SQL:false}
+        use_sql_comments: ${HIBERNATE_USE_SQL_COMMENTS:false}
 
   flyway:
     url: jdbc:postgresql://${app.db.host}:${app.db.port}/${app.db.name}
     user: ${app.db.username}
     password: ${app.db.password}
-    clean-disabled: false
     default-schema: public
     create-schemas: true
 
+  sql:
+    init:
+      mode: always
+
+# Application-specific configuration
 app:
   db:
     host: ${APP_DB_HOST:localhost}
@@ -38,8 +50,19 @@ app:
     username: ${APP_DB_USERNAME:teamtempo_admin}
     password: ${APP_DB_PASSWORD:teamtempo_password}
 
+# Security configuration
 security:
   jwt:
-    secret-key: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
-    # 24h in millisecond
-    expiration-time: 86400000
+    # JWT secret key - MUST be set via environment variable in production
+    secret-key: ${JWT_SECRET_KEY:3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b}
+    # Token expiration time in milliseconds (default: 24 hours)
+    expiration-time: ${JWT_EXPIRATION_TIME:86400000}
+
+# Server configuration
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:on_param}
+    include-exception: false
