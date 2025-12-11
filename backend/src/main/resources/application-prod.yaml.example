@@ -29,3 +29,4 @@ LOG_FILE=/var/log/teamtempo/application.log
 # or
 LOG_PATH=/var/log/teamtempo/
 
+
