@@ -1,0 +1,142 @@
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.notification {
+  pointer-events: auto;
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  animation: slideIn 0.3s ease-out;
+  border-left: 4px solid;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+
+  &.notification-dismissing {
+    animation: slideOut 0.3s ease-out forwards;
+  }
+
+  &.notification-success {
+    border-left-color: #4CAF50;
+    background-color: #E8F5E9;
+
+    .notification-icon {
+      color: #2E7D32;
+    }
+  }
+
+  &.notification-error {
+    border-left-color: #F44336;
+    background-color: #FFEBEE;
+
+    .notification-icon {
+      color: #C62828;
+    }
+  }
+
+  &.notification-warning {
+    border-left-color: #FF9800;
+    background-color: #FFF3E0;
+
+    .notification-icon {
+      color: #E65100;
+    }
+  }
+
+  &.notification-info {
+    border-left-color: var(--primary-teal);
+    background-color: #E0F2F1;
+
+    .notification-icon {
+      color: #00695C;
+    }
+  }
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-icon {
+  font-size: 20px;
+  font-weight: bold;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.notification-message {
+  flex: 1;
+  color: var(--text-gray);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-gray);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:focus {
+    outline: 2px solid var(--primary-teal);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .notification-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+

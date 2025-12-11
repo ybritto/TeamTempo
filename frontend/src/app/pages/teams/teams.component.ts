@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {HeaderComponent} from '../../shared/header/header.component';
 import {TeamService, TeamsService, ProjectsService, TeamDto, ProjectDto} from '../../../api';
+import {NotificationService} from '../../shared/services/notification.service';
 
 // Project Configuration types (until generated models are updated)
 type DurationUnit = 'DAYS' | 'WEEKS' | 'MONTHS';
@@ -29,6 +30,7 @@ export class TeamsComponent {
   private teamsService = inject(TeamsService);
   private projectsService = inject(ProjectsService);
   private fb = inject(FormBuilder);
+  private notificationService = inject(NotificationService);
 
   navLinks = [
     { label: 'Dashboard', route: '/dashboard' },
@@ -156,6 +158,7 @@ export class TeamsComponent {
           this.createTeamForm.reset();
           this.showCreateForm.set(false);
           this.creating.set(false);
+          this.notificationService.success('Team created successfully!');
         },
         error: (err) => {
           console.error('Error creating team:', err);
@@ -222,6 +225,7 @@ export class TeamsComponent {
           this.editTeamForm.reset();
           this.editingTeamUuid.set(null);
           this.updating.set(false);
+          this.notificationService.success('Team updated successfully!');
         },
         error: (err) => {
           console.error('Error updating team:', err);
@@ -262,6 +266,7 @@ export class TeamsComponent {
         this.loadTeams();
         this.deletingTeamUuid.set(null);
         this.deleteError.set(null);
+        this.notificationService.success(`Team "${teamName}" deleted successfully!`);
       },
       error: (err) => {
         console.error('Error deleting team:', err);
@@ -363,6 +368,7 @@ export class TeamsComponent {
         this.selectionMode.set(false);
         this.bulkDeleting.set(false);
         this.bulkDeleteError.set(null);
+        this.notificationService.success(`${count} team${count > 1 ? 's' : ''} deleted successfully!`);
       },
       error: (err) => {
         console.error('Error deleting teams:', err);
@@ -531,20 +537,21 @@ export class TeamsComponent {
 
     this.deletingProjectUuid.set(project.uuid);
 
-    this.projectsService.deleteProject(project.uuid).subscribe({
-      next: () => {
-        // Remove the project from the cached projects list
-        this.teamProjects.update(projectsMap => {
-          const newMap = new Map(projectsMap);
-          const projects = newMap.get(teamUuid) || [];
-          const updatedProjects = projects.filter(p => p.uuid !== project.uuid);
-          newMap.set(teamUuid, updatedProjects);
-          return newMap;
-        });
+      this.projectsService.deleteProject(project.uuid).subscribe({
+        next: () => {
+          // Remove the project from the cached projects list
+          this.teamProjects.update(projectsMap => {
+            const newMap = new Map(projectsMap);
+            const projects = newMap.get(teamUuid) || [];
+            const updatedProjects = projects.filter(p => p.uuid !== project.uuid);
+            newMap.set(teamUuid, updatedProjects);
+            return newMap;
+          });
 
-        this.deletingProjectUuid.set(null);
-        this.deleteProjectError.set(null);
-      },
+          this.deletingProjectUuid.set(null);
+          this.deleteProjectError.set(null);
+          this.notificationService.success(`Project "${projectName}" deleted successfully!`);
+        },
       error: (err) => {
         console.error('Error deleting project:', err);
         this.deleteProjectError.set(
@@ -626,6 +633,7 @@ export class TeamsComponent {
           this.editingProjectUuid.set(null);
           this.editingProjectTeamUuid.set(null);
           this.updatingProject.set(false);
+          this.notificationService.success('Project updated successfully!');
         },
         error: (err) => {
           console.error('Error updating project:', err);
@@ -723,6 +731,7 @@ export class TeamsComponent {
           this.createProjectForm.reset();
           this.creatingProjectTeamUuid.set(null);
           this.creatingProject.set(false);
+          this.notificationService.success('Project created successfully!');
         },
         error: (err) => {
           console.error('Error creating project:', err);

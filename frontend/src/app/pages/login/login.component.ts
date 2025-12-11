@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { HeaderComponent } from '../../shared/header/header.component';
 import { LoginUserDto } from '../../../api';
+import { NotificationService } from '../../shared/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -40,6 +42,7 @@ export class LoginComponent {
 
       this.authService.login(loginData).subscribe({
         next: () => {
+          this.notificationService.success('Login successful! Welcome back.');
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {

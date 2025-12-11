@@ -60,3 +60,4 @@ security:
     secret-key: ${JWT_SECRET_KEY}  # REQUIRED - no default for security
 
 
+

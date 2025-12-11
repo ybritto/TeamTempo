@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { HeaderComponent } from '../../shared/header/header.component';
 import { RegisterUserDto } from '../../../api';
+import { NotificationService } from '../../shared/services/notification.service';
 
 @Component({
   selector: 'app-signup',
@@ -16,12 +17,12 @@ export class SignupComponent {
   signupForm: FormGroup;
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
-  successMessage = signal<string | null>(null);
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.signupForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2)]],
@@ -46,7 +47,6 @@ export class SignupComponent {
     if (this.signupForm.valid) {
       this.isLoading.set(true);
       this.errorMessage.set(null);
-      this.successMessage.set(null);
 
       const signupData: RegisterUserDto = {
         name: this.signupForm.value.fullName,
@@ -56,7 +56,7 @@ export class SignupComponent {
 
       this.authService.signup(signupData).subscribe({
         next: () => {
-          this.successMessage.set('Account created successfully! Redirecting to login...');
+          this.notificationService.success('Account created successfully! Redirecting to login...');
           setTimeout(() => {
             this.router.navigate(['/login']);
           }, 2000);
