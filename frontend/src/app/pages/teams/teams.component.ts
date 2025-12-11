@@ -4,6 +4,8 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {HeaderComponent} from '../../shared/header/header.component';
 import {TeamService, TeamsService, ProjectsService, TeamDto, ProjectDto} from '../../../api';
 import {NotificationService} from '../../shared/services/notification.service';
+import {ConfirmationDialogService} from '../../shared/services/confirmation.service';
+import {take} from 'rxjs';
 
 // Project Configuration types (until generated models are updated)
 type DurationUnit = 'DAYS' | 'WEEKS' | 'MONTHS';
@@ -31,6 +33,7 @@ export class TeamsComponent {
   private projectsService = inject(ProjectsService);
   private fb = inject(FormBuilder);
   private notificationService = inject(NotificationService);
+  private confirmationService = inject(ConfirmationDialogService);
 
   navLinks = [
     { label: 'Dashboard', route: '/dashboard' },
@@ -252,32 +255,35 @@ export class TeamsComponent {
     this.deleteError.set(null);
 
     const teamName = team.name || 'this team';
-    const confirmed = confirm(`Are you sure you want to delete "${teamName}"? This action cannot be undone.`);
 
-    if (!confirmed) {
-      return;
-    }
+    this.confirmationService.confirmDelete(teamName, 'team', true)
+      .pipe(take(1))
+      .subscribe(confirmed => {
+        if (!confirmed) {
+          return;
+        }
 
-    this.deletingTeamUuid.set(team.uuid);
+        this.deletingTeamUuid.set(team.uuid || '');
 
-    this.teamsService.deleteTeam(team.uuid).subscribe({
-      next: () => {
-        // Reload teams list
-        this.loadTeams();
-        this.deletingTeamUuid.set(null);
-        this.deleteError.set(null);
-        this.notificationService.success(`Team "${teamName}" deleted successfully!`);
-      },
-      error: (err) => {
-        console.error('Error deleting team:', err);
-        this.deleteError.set(
-          err?.error?.detail ||
-          err?.error?.message ||
-          'Failed to delete team. Please try again.'
-        );
-        this.deletingTeamUuid.set(null);
-      }
-    });
+        this.teamsService.deleteTeam(team.uuid || '').subscribe({
+          next: () => {
+            // Reload teams list
+            this.loadTeams();
+            this.deletingTeamUuid.set(null);
+            this.deleteError.set(null);
+            this.notificationService.success(`Team "${teamName}" deleted successfully!`);
+          },
+          error: (err) => {
+            console.error('Error deleting team:', err);
+            this.deleteError.set(
+              err?.error?.detail ||
+              err?.error?.message ||
+              'Failed to delete team. Please try again.'
+            );
+            this.deletingTeamUuid.set(null);
+          }
+        });
+      });
   }
 
   toggleSelectionMode(): void {
@@ -350,36 +356,39 @@ export class TeamsComponent {
     }
 
     const count = selectedUuids.length;
-    const confirmed = confirm(`Are you sure you want to delete ${count} team${count > 1 ? 's' : ''}? This action cannot be undone.`);
 
-    if (!confirmed) {
-      return;
-    }
+    this.confirmationService.confirmBulkDelete(count, 'team' + (count > 1 ? 's' : ''))
+      .pipe(take(1))
+      .subscribe(confirmed => {
+        if (!confirmed) {
+          return;
+        }
 
-    this.bulkDeleting.set(true);
-    this.bulkDeleteError.set(null);
-
-    this.teamsService.deleteSelectedTeams(selectedUuids).subscribe({
-      next: () => {
-        // Reload teams list
-        this.loadTeams();
-        // Clear selection and exit selection mode
-        this.selectedTeamUuids.set(new Set());
-        this.selectionMode.set(false);
-        this.bulkDeleting.set(false);
+        this.bulkDeleting.set(true);
         this.bulkDeleteError.set(null);
-        this.notificationService.success(`${count} team${count > 1 ? 's' : ''} deleted successfully!`);
-      },
-      error: (err) => {
-        console.error('Error deleting teams:', err);
-        this.bulkDeleteError.set(
-          err?.error?.detail ||
-          err?.error?.message ||
-          'Failed to delete teams. Please try again.'
-        );
-        this.bulkDeleting.set(false);
-      }
-    });
+
+        this.teamsService.deleteSelectedTeams(selectedUuids).subscribe({
+          next: () => {
+            // Reload teams list
+            this.loadTeams();
+            // Clear selection and exit selection mode
+            this.selectedTeamUuids.set(new Set());
+            this.selectionMode.set(false);
+            this.bulkDeleting.set(false);
+            this.bulkDeleteError.set(null);
+            this.notificationService.success(`${count} team${count > 1 ? 's' : ''} deleted successfully!`);
+          },
+          error: (err) => {
+            console.error('Error deleting teams:', err);
+            this.bulkDeleteError.set(
+              err?.error?.detail ||
+              err?.error?.message ||
+              'Failed to delete teams. Please try again.'
+            );
+            this.bulkDeleting.set(false);
+          }
+        });
+      });
   }
 
   formatDate(dateString: string | undefined): string {
@@ -529,39 +538,42 @@ export class TeamsComponent {
     this.deleteProjectError.set(null);
 
     const projectName = project.name || 'this project';
-    const confirmed = confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`);
 
-    if (!confirmed) {
-      return;
-    }
+    this.confirmationService.confirmDelete(projectName, 'project')
+      .pipe(take(1))
+      .subscribe(confirmed => {
+        if (!confirmed) {
+          return;
+        }
 
-    this.deletingProjectUuid.set(project.uuid);
+        this.deletingProjectUuid.set(project.uuid || '');
 
-      this.projectsService.deleteProject(project.uuid).subscribe({
-        next: () => {
-          // Remove the project from the cached projects list
-          this.teamProjects.update(projectsMap => {
-            const newMap = new Map(projectsMap);
-            const projects = newMap.get(teamUuid) || [];
-            const updatedProjects = projects.filter(p => p.uuid !== project.uuid);
-            newMap.set(teamUuid, updatedProjects);
-            return newMap;
-          });
+        this.projectsService.deleteProject(project.uuid || '').subscribe({
+          next: () => {
+            // Remove the project from the cached projects list
+            this.teamProjects.update(projectsMap => {
+              const newMap = new Map(projectsMap);
+              const projects = newMap.get(teamUuid) || [];
+              const updatedProjects = projects.filter(p => p.uuid !== project.uuid);
+              newMap.set(teamUuid, updatedProjects);
+              return newMap;
+            });
 
-          this.deletingProjectUuid.set(null);
-          this.deleteProjectError.set(null);
-          this.notificationService.success(`Project "${projectName}" deleted successfully!`);
-        },
-      error: (err) => {
-        console.error('Error deleting project:', err);
-        this.deleteProjectError.set(
-          err?.error?.detail ||
-          err?.error?.message ||
-          'Failed to delete project. Please try again.'
-        );
-        this.deletingProjectUuid.set(null);
-      }
-    });
+            this.deletingProjectUuid.set(null);
+            this.deleteProjectError.set(null);
+            this.notificationService.success(`Project "${projectName}" deleted successfully!`);
+          },
+          error: (err) => {
+            console.error('Error deleting project:', err);
+            this.deleteProjectError.set(
+              err?.error?.detail ||
+              err?.error?.message ||
+              'Failed to delete project. Please try again.'
+            );
+            this.deletingProjectUuid.set(null);
+          }
+        });
+      });
   }
 
   isDeletingProject(projectUuid: string | undefined): boolean {

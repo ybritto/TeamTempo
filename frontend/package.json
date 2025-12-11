@@ -29,13 +29,14 @@
     "@angular/forms": "^20.3.0",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
+    "@openapitools/openapi-generator-cli": "^2.14.1",
+    "@primeng/themes": "^21.0.1",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primeng": "^20.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0",
-    "@openapitools/openapi-generator-cli": "^2.14.1"
+    "zone.js": "~0.15.0"
   },
   "devDependencies": {
     "@angular/build": "^20.3.10",

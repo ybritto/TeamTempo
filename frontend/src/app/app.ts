@@ -1,10 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NotificationComponent } from './shared/notification/notification.component';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NotificationComponent],
+  imports: [RouterOutlet, NotificationComponent, ConfirmDialog],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
