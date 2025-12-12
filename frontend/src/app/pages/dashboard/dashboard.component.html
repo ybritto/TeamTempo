@@ -59,8 +59,64 @@
           </div>
         }
 
+        @if (availableIterations().length > 0) {
+          <div class="iteration-selector-container">
+            <label for="iteration-select" class="selector-label">Select Sprint</label>
+            <select
+              id="iteration-select"
+              class="selector"
+              [value]="selectedIterationId()"
+              (change)="onIterationChange($event)">
+              @for (iteration of availableIterations(); track iteration.uuid) {
+                <option [value]="iteration.uuid">{{ formatIterationName(iteration) }}</option>
+              }
+            </select>
+          </div>
+        } @else if (selectedProjectId() && !loadingProjectDetails()) {
+          <div class="iteration-selector-container">
+            <label for="iteration-select" class="selector-label">Select Sprint</label>
+            <select
+              id="iteration-select"
+              class="selector"
+              disabled>
+              <option>No sprints available</option>
+            </select>
+          </div>
+        }
+
         <a routerLink="/teams" class="manage-link">Something Missing? Manage Teams & Projects</a>
       </div>
+
+      @if (selectedIteration()) {
+        <div class="sprint-dates-container">
+          <div class="sprint-dates-section">
+            <h3 class="sprint-dates-title">Planned Dates</h3>
+            <div class="sprint-dates-content">
+              <div class="sprint-date-item">
+                <span class="sprint-date-label">Start:</span>
+                <span class="sprint-date-value">{{ formatDate(plannedStartDate()) }}</span>
+              </div>
+              <div class="sprint-date-item">
+                <span class="sprint-date-label">End:</span>
+                <span class="sprint-date-value">{{ formatDate(plannedEndDate()) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="sprint-dates-section">
+            <h3 class="sprint-dates-title">Actual Dates</h3>
+            <div class="sprint-dates-content">
+              <div class="sprint-date-item">
+                <span class="sprint-date-label">Start:</span>
+                <span class="sprint-date-value" [class.not-available]="!actualStartDate()">{{ formatDate(actualStartDate()) }}</span>
+              </div>
+              <div class="sprint-date-item">
+                <span class="sprint-date-label">End:</span>
+                <span class="sprint-date-value" [class.not-available]="!actualEndDate()">{{ formatDate(actualEndDate()) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
 
       <div class="metrics-container">
       <!-- Capacity Metric Card -->

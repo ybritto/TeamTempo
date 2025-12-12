@@ -5,6 +5,7 @@ import { HeaderComponent } from '../../shared/header/header.component';
 import { TeamService } from '../../../api/api/team.service';
 import { TeamDto } from '../../../api/model/teamDto';
 import { ProjectDto } from '../../../api/model/projectDto';
+import { IterationDto } from '../../../api/model/iterationDto';
 
 interface Team {
   id: string;
@@ -45,6 +46,10 @@ export class DashboardComponent {
 
   selectedTeamId = signal<string>('');
   selectedProjectId = signal<string>('');
+  selectedIterationId = signal<string>('');
+  
+  projectDetails = signal<ProjectDto | null>(null);
+  loadingProjectDetails = signal<boolean>(false);
 
   constructor() {
     this.loadTeams();
@@ -66,7 +71,9 @@ export class DashboardComponent {
           
           // Set the first project as selected if available
           if (firstTeam.projects.length > 0) {
-            this.selectedProjectId.set(firstTeam.projects[0].uuid || '');
+            const firstProjectUuid = firstTeam.projects[0].uuid || '';
+            this.selectedProjectId.set(firstProjectUuid);
+            this.loadProjectDetails(firstProjectUuid);
           }
         }
         
@@ -112,25 +119,42 @@ export class DashboardComponent {
     if (!selectedId || projects.length === 0) {
       return null;
     }
-    const projectDto = projects.find(p => p.uuid === selectedId);
-    if (!projectDto) return null;
-    
-    // Map ProjectDto to Project interface
-    // Note: Project metrics are not available in the API yet, using defaults
-    return {
-      id: projectDto.uuid || '',
-      name: projectDto.name || 'Unnamed Project',
-      capacityProjected: 0,
-      capacityPerformed: 0,
-      storyPointsProjected: 0,
-      storyPointsDelivered: 0
-    };
+    return projects.find(p => p.uuid === selectedId) || null;
   });
 
-  capacityProjected = computed(() => this.selectedProject()?.capacityProjected ?? 0);
-  capacityPerformed = computed(() => this.selectedProject()?.capacityPerformed ?? 0);
-  storyPointsProjected = computed(() => this.selectedProject()?.storyPointsProjected ?? 0);
-  storyPointsDelivered = computed(() => this.selectedProject()?.storyPointsDelivered ?? 0);
+  availableIterations = computed(() => {
+    const projectDetails = this.projectDetails();
+    return projectDetails?.iterations || [];
+  });
+
+  selectedIteration = computed(() => {
+    const iterations = this.availableIterations();
+    const selectedId = this.selectedIterationId();
+    if (!selectedId || iterations.length === 0) {
+      return iterations.length > 0 ? iterations[0] : null;
+    }
+    return iterations.find(i => i.uuid === selectedId) || iterations[0] || null;
+  });
+
+  capacityProjected = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.plannedCapacity ?? 0;
+  });
+
+  capacityPerformed = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.actualCapacity ?? 0;
+  });
+
+  storyPointsProjected = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.plannedForecast ?? 0;
+  });
+
+  storyPointsDelivered = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.actualForecast ?? 0;
+  });
 
   capacityPercentage = computed(() => {
     const projected = this.capacityProjected();
@@ -161,15 +185,98 @@ export class DashboardComponent {
     // Access projects directly from teams array to avoid timing issues with computed
     const team = this.teams().find(t => t.id === teamId);
     if (team && team.projects.length > 0) {
-      this.selectedProjectId.set(team.projects[0].uuid || '');
+      const firstProjectUuid = team.projects[0].uuid || '';
+      this.selectedProjectId.set(firstProjectUuid);
+      this.loadProjectDetails(firstProjectUuid);
     } else {
       this.selectedProjectId.set('');
+      this.projectDetails.set(null);
+      this.selectedIterationId.set('');
     }
   }
 
   onProjectChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
-    this.selectedProjectId.set(selectElement.value);
+    const projectId = selectElement.value;
+    this.selectedProjectId.set(projectId);
+    this.selectedIterationId.set('');
+    this.loadProjectDetails(projectId);
   }
+
+  onIterationChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedIterationId.set(selectElement.value);
+  }
+
+  loadProjectDetails(projectUuid: string): void {
+    if (!projectUuid) {
+      this.projectDetails.set(null);
+      this.selectedIterationId.set('');
+      return;
+    }
+
+    this.loadingProjectDetails.set(true);
+    
+    // Get iterations from the project in the teams list
+    const project = this.selectedProject();
+    if (project) {
+      this.projectDetails.set(project);
+      this.loadingProjectDetails.set(false);
+      
+      // Set first iteration as selected if available and none is selected
+      if (project.iterations && project.iterations.length > 0) {
+        if (!this.selectedIterationId()) {
+          this.selectedIterationId.set(project.iterations[0].uuid || '');
+        }
+      } else {
+        this.selectedIterationId.set('');
+      }
+    } else {
+      this.projectDetails.set(null);
+      this.selectedIterationId.set('');
+      this.loadingProjectDetails.set(false);
+    }
+  }
+
+  formatIterationName(iteration: IterationDto): string {
+    if (iteration.name) {
+      return iteration.name;
+    }
+    if (iteration.plannedStartDate) {
+      const startDate = new Date(iteration.plannedStartDate);
+      return `Sprint ${startDate.toLocaleDateString()}`;
+    }
+    return 'Unnamed Sprint';
+  }
+
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  }
+
+  plannedStartDate = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.plannedStartDate;
+  });
+
+  plannedEndDate = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.plannedEndDate;
+  });
+
+  actualStartDate = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.actualStartDate;
+  });
+
+  actualEndDate = computed(() => {
+    const iteration = this.selectedIteration();
+    return iteration?.actualEndDate;
+  });
 }
 
