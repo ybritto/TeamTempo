@@ -1,0 +1,31 @@
+IterationDto:
+  description: Representation of an iteration in the system
+  type: object
+  properties:
+    uuid:
+      type: string
+    name:
+      type: string
+    project:
+      $ref: './project.yaml#/ProjectDto'
+    plannedStartDate:
+      type: string
+      format: date
+    plannedEndDate:
+      type: string
+      format: date
+    plannedCapacity:
+      type: integer
+    plannedForecast:
+      type: integer
+    actualStartDate:
+      type: string
+      format: date
+    actualEndDate:
+      type: string
+      format: date
+    actualCapacity:
+      type: integer
+    actualForecast:
+      type: integer
+

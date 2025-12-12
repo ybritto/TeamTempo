@@ -20,3 +20,7 @@ ProjectDto:
       type: boolean
     projectConfiguration:
       $ref: './projectConfiguration.yaml#/ProjectConfigurationDto'
+    iterations:
+      type: array
+      items:
+        $ref: './iteration.yaml#/IterationDto'

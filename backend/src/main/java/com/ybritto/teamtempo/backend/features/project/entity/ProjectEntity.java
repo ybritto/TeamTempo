@@ -1,5 +1,6 @@
 package com.ybritto.teamtempo.backend.features.project.entity;
 
+import com.ybritto.teamtempo.backend.features.iteration.entity.IterationEntity;
 import com.ybritto.teamtempo.backend.features.projectConfiguration.entity.ProjectConfigurationEntity;
 import com.ybritto.teamtempo.backend.features.team.entity.TeamEntity;
 import jakarta.persistence.CascadeType;
@@ -81,6 +82,9 @@ public class ProjectEntity {
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     @SQLRestriction("is_active = true")
     private List<ProjectConfigurationEntity> projectConfigurations;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
+    private List<IterationEntity> iterations;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

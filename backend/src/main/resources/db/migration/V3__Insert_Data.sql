@@ -160,3 +160,154 @@ values (uuid_generate_v4(),
         (SELECT key_id FROM project WHERE name = 'Mobile App Development'),
         now(),
         now());
+
+-- ###################################
+--              ITERATIONS
+-- ###################################
+
+-- Iterations for Web Application Development (2-week sprints)
+-- Sprint 1: Completed
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Sprint 1',
+        (SELECT key_id FROM project WHERE name = 'Web Application Development'),
+        CURRENT_DATE - INTERVAL '4 weeks',
+        CURRENT_DATE - INTERVAL '2 weeks',
+        40,
+        35,
+        CURRENT_DATE - INTERVAL '4 weeks',
+        CURRENT_DATE - INTERVAL '2 weeks',
+        38,
+        32,
+        now(),
+        now());
+
+-- Sprint 2: Completed
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Sprint 2',
+        (SELECT key_id FROM project WHERE name = 'Web Application Development'),
+        CURRENT_DATE - INTERVAL '2 weeks',
+        CURRENT_DATE,
+        45,
+        40,
+        CURRENT_DATE - INTERVAL '2 weeks',
+        CURRENT_DATE,
+        42,
+        38,
+        now(),
+        now());
+
+-- Sprint 3: In Progress
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Sprint 3',
+        (SELECT key_id FROM project WHERE name = 'Web Application Development'),
+        CURRENT_DATE,
+        CURRENT_DATE + INTERVAL '2 weeks',
+        50,
+        45,
+        CURRENT_DATE,
+        NULL,
+        NULL,
+        NULL,
+        now(),
+        now());
+
+-- Sprint 4: Planned
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Sprint 4',
+        (SELECT key_id FROM project WHERE name = 'Web Application Development'),
+        CURRENT_DATE + INTERVAL '2 weeks',
+        CURRENT_DATE + INTERVAL '4 weeks',
+        50,
+        45,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        now(),
+        now());
+
+-- Iterations for API Backend Services (1-week sprints)
+-- Week 1: Completed
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Week 1',
+        (SELECT key_id FROM project WHERE name = 'API Backend Services'),
+        CURRENT_DATE - INTERVAL '3 weeks',
+        CURRENT_DATE - INTERVAL '2 weeks',
+        20,
+        18,
+        CURRENT_DATE - INTERVAL '3 weeks',
+        CURRENT_DATE - INTERVAL '2 weeks',
+        22,
+        20,
+        now(),
+        now());
+
+-- Week 2: Completed
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Week 2',
+        (SELECT key_id FROM project WHERE name = 'API Backend Services'),
+        CURRENT_DATE - INTERVAL '2 weeks',
+        CURRENT_DATE - INTERVAL '1 week',
+        25,
+        22,
+        CURRENT_DATE - INTERVAL '2 weeks',
+        CURRENT_DATE - INTERVAL '1 week',
+        24,
+        21,
+        now(),
+        now());
+
+-- Week 3: In Progress
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Week 3',
+        (SELECT key_id FROM project WHERE name = 'API Backend Services'),
+        CURRENT_DATE - INTERVAL '1 week',
+        CURRENT_DATE,
+        25,
+        22,
+        CURRENT_DATE - INTERVAL '1 week',
+        NULL,
+        NULL,
+        NULL,
+        now(),
+        now());
+
+-- Iterations for Automated Testing Suite (Monthly iterations)
+-- Month 1: Completed
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Month 1',
+        (SELECT key_id FROM project WHERE name = 'Automated Testing Suite'),
+        CURRENT_DATE - INTERVAL '1 month',
+        CURRENT_DATE,
+        100,
+        90,
+        CURRENT_DATE - INTERVAL '1 month',
+        CURRENT_DATE,
+        95,
+        88,
+        now(),
+        now());
+
+-- Month 2: Planned
+insert into iteration (uuid, name, project_key_id, planned_start_date, planned_end_date, planned_capacity, planned_forecast, actual_start_date, actual_end_date, actual_capacity, actual_forecast, created_at, updated_at)
+values (uuid_generate_v4(),
+        'Month 2',
+        (SELECT key_id FROM project WHERE name = 'Automated Testing Suite'),
+        CURRENT_DATE,
+        CURRENT_DATE + INTERVAL '1 month',
+        110,
+        100,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        now(),
+        now());

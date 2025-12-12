@@ -1,6 +1,7 @@
 package com.ybritto.teamtempo.backend.features.project.mapper;
 
 import com.ybritto.teamtempo.backend.core.mapper.CommonsMapper;
+import com.ybritto.teamtempo.backend.features.iteration.mapper.IterationMapper;
 import com.ybritto.teamtempo.backend.features.project.entity.ProjectEntity;
 import com.ybritto.teamtempo.backend.features.projectConfiguration.mapper.ProjectConfigurationMapper;
 import com.ybritto.teamtempo.backend.gen.model.ProjectDto;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring",
         nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
-        uses = {CommonsMapper.class, ProjectConfigurationMapper.class})
+        uses = {CommonsMapper.class, ProjectConfigurationMapper.class, IterationMapper.class})
 public interface ProjectMapper {
 
     default List<ProjectDto> mapToDtoListWithoutTeam(List<ProjectEntity> allByTeam) {
@@ -33,6 +34,7 @@ public interface ProjectMapper {
     @Named("mapToDtoWithoutTeam")
     @Mapping(target = "team", ignore = true)
     @Mapping(target = "projectConfiguration", source = "projectConfigurations", qualifiedByName = "mapToDtoFromList")
+    @Mapping(target = "iterations", source = "iterations", qualifiedByName = "mapIterationsToDtoWithoutProject")
     ProjectDto mapToDtoWithoutTeam(ProjectEntity entity);
 
 
