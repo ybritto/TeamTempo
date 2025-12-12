@@ -123,7 +123,6 @@ public class TeamService {
                     teamUuidList.size(), teamsToDelete.size());
         }
 
-        // TODO - Change this for logical deletion by deactivating it
         teamRepository.deleteAllById(teamsToDelete.stream().map(TeamEntity::getId).toList());
 
         logger.info("Successfully deleted {} teams", teamsToDelete.size());

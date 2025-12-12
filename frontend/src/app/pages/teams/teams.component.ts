@@ -5,6 +5,7 @@ import {HeaderComponent} from '../../shared/header/header.component';
 import {TeamService, TeamsService, ProjectsService, TeamDto, ProjectDto} from '../../../api';
 import {NotificationService} from '../../shared/services/notification.service';
 import {ConfirmationDialogService} from '../../shared/services/confirmation.service';
+import {Tag} from 'primeng/tag';
 import {take} from 'rxjs';
 
 // Project Configuration types (until generated models are updated)
@@ -23,7 +24,7 @@ interface ProjectConfigurationDto {
 
 @Component({
   selector: 'app-teams',
-  imports: [CommonModule, ReactiveFormsModule, HeaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, Tag],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss'
 })
@@ -539,7 +540,7 @@ export class TeamsComponent {
 
     const projectName = project.name || 'this project';
 
-    this.confirmationService.confirmDelete(projectName, 'project')
+    this.confirmationService.confirmDelete(projectName, 'project', true)
       .pipe(take(1))
       .subscribe(confirmed => {
         if (!confirmed) {
