@@ -281,5 +281,32 @@ class TeamRepositoryIT {
         assertThat(user2Teams).hasSize(1);
         assertThat(user2Teams.get(0).getName()).isEqualTo("User2 Team");
     }
+
+    @Test
+    @DisplayName("Should use team_key_id_seq sequence and nothing else")
+    void shouldUseTeamKeyIdSeqSequenceAndNothingElse() throws NoSuchFieldException {
+        // Given - Get the id field from TeamEntity
+        java.lang.reflect.Field idField = TeamEntity.class.getDeclaredField("id");
+
+        // When - Check the SequenceGenerator annotation
+        jakarta.persistence.SequenceGenerator sequenceGenerator = idField.getAnnotation(jakarta.persistence.SequenceGenerator.class);
+
+        // Then - Verify the sequence name is exactly "team_key_id_seq"
+        assertThat(sequenceGenerator)
+                .as("TeamEntity.id field must have @SequenceGenerator annotation")
+                .isNotNull();
+
+        String actualSequenceName = sequenceGenerator.sequenceName();
+        assertThat(actualSequenceName)
+                .as("TeamEntity must use 'team_key_id_seq' sequence, not '%s'. " +
+                        "Using the wrong sequence (e.g., 'app_user_key_id_seq') will cause primary key violations.",
+                        actualSequenceName)
+                .isEqualTo("team_key_id_seq");
+
+        // Verify the generator name matches
+        assertThat(sequenceGenerator.name())
+                .as("Generator name should be 'teamSeqGen'")
+                .isEqualTo("teamSeqGen");
+    }
 }
 

@@ -3,6 +3,7 @@ package com.ybritto.teamtempo.backend.features.team.entity;
 
 import com.ybritto.teamtempo.backend.authentication.entity.UserEntity;
 import com.ybritto.teamtempo.backend.features.project.entity.ProjectEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,7 +48,7 @@ public class TeamEntity {
     @Id
     @Column(name = "key_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teamSeqGen")
-    @SequenceGenerator(name = "teamSeqGen", sequenceName = "app_user_key_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "teamSeqGen", sequenceName = "team_key_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "uuid", unique = true, nullable = false, updatable = false)
@@ -75,7 +76,7 @@ public class TeamEntity {
     @NotNull(message = "User can not be null")
     private UserEntity user;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "team")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "team", cascade = CascadeType.REMOVE)
     private List<ProjectEntity> projects;
 
 

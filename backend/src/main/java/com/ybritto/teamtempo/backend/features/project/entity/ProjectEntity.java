@@ -2,6 +2,7 @@ package com.ybritto.teamtempo.backend.features.project.entity;
 
 import com.ybritto.teamtempo.backend.features.projectConfiguration.entity.ProjectConfigurationEntity;
 import com.ybritto.teamtempo.backend.features.team.entity.TeamEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -77,7 +78,7 @@ public class ProjectEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     @SQLRestriction("is_active = true")
     private List<ProjectConfigurationEntity> projectConfigurations;
 
