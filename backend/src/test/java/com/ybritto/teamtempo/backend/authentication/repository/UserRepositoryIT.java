@@ -159,5 +159,32 @@ class UserRepositoryIT {
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().isEnabled()).isFalse();
     }
+
+    @Test
+    @DisplayName("Should use app_user_key_id_seq sequence and nothing else")
+    void shouldUseAppUserKeyIdSeqSequenceAndNothingElse() throws NoSuchFieldException {
+        // Given - Get the id field from UserEntity
+        java.lang.reflect.Field idField = UserEntity.class.getDeclaredField("id");
+
+        // When - Check the SequenceGenerator annotation
+        jakarta.persistence.SequenceGenerator sequenceGenerator = idField.getAnnotation(jakarta.persistence.SequenceGenerator.class);
+
+        // Then - Verify the sequence name is exactly "app_user_key_id_seq"
+        assertThat(sequenceGenerator)
+                .as("UserEntity.id field must have @SequenceGenerator annotation")
+                .isNotNull();
+
+        String actualSequenceName = sequenceGenerator.sequenceName();
+        assertThat(actualSequenceName)
+                .as("UserEntity must use 'app_user_key_id_seq' sequence, not '%s'. " +
+                        "Using the wrong sequence will cause primary key violations.",
+                        actualSequenceName)
+                .isEqualTo("app_user_key_id_seq");
+
+        // Verify the generator name matches
+        assertThat(sequenceGenerator.name())
+                .as("Generator name should be 'appUserSeqGen'")
+                .isEqualTo("appUserSeqGen");
+    }
 }
 
